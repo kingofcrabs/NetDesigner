@@ -16,13 +16,15 @@ namespace WinFormsEditExample
             for (int row = 0; row < yNum; row++)
             {
                 List<Point2D> ptsSameRow = new List<Point2D>();
+                bool isEvenLine = row % 2 == 0;
+                double xOffset = isEvenLine ? xLen / 2.0 : 0;
                 for (int col = 0; col < xNum; col++)
                 {
-                    double xOffset = col % 2 == 0 ? xLen / 2.0 : 0;
                     double xPos = xOffset + col * xLen;
                     double yPos = row * yLen;
                     ptsSameRow.Add(new Point2D(xPos, yPos));
                 }
+                ptsVector.Add(ptsSameRow);
             }
 
             for (int r = 0; r < yNum - 1; r++)
@@ -36,6 +38,7 @@ namespace WinFormsEditExample
                     Point2D ptEnd1 = upperRow[c];
                     var line = new DxfLine(ptStart, ptEnd1);
                     line.Thickness = thickness;
+                    line.Color = EntityColors.White;
                     entities.Add(line);
 
                     int ptEnd2Col = isEvenLine ? c + 1 : c - 1;
@@ -43,6 +46,7 @@ namespace WinFormsEditExample
                         continue;
                     Point2D ptEnd2 = upperRow[ptEnd2Col];
                     line = new DxfLine(ptStart, ptEnd2);
+                    line.Color = EntityColors.White;
                     line.Thickness = thickness;
                     entities.Add(line);
                 }

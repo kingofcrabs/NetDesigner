@@ -112,15 +112,79 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <assembly alias="WW" name="WW, Version=4.0.37.2, Culture=neutral, PublicKeyToken=87d16b8f7b531b65" />
+  <data name="dxfLayout1.InsertionBasePoint" type="WW.Math.Point3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfLayout1.Limits" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAMAgAAAEZXVywgVmVyc2lvbj00LjAuMzcuMiwgQ3VsdHVyZT1uZXV0cmFs
+        LCBQdWJsaWNLZXlUb2tlbj04N2QxNmI4ZjdiNTMxYjY1BQEAAAAcV1cuTWF0aC5HZW9tZXRyeS5SZWN0
+        YW5nbGUyRAIAAAAHY29ybmVyMQdjb3JuZXIyBAQPV1cuTWF0aC5Qb2ludDJEAgAAAA9XVy5NYXRoLlBv
+        aW50MkQCAAAAAgAAAAX9////D1dXLk1hdGguUG9pbnQyRAIAAAABWAFZAAAGBgIAAAAAAAAAAAAAAAAA
+        AAAAAAAAAfz////9////AAAAAABAekAAAAAAAJByQAs=
+</value>
+  </data>
+  <data name="dxfLayout1.MaxExtents" type="WW.Math.Point3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfLayout1.MinExtents" type="WW.Math.Point3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfLayout1.PaperImageOrigin" type="WW.Math.Point2D, WW">
+    <value>0, 0</value>
+  </data>
+  <data name="dxfLayout1.PlotOrigin" type="WW.Math.Point2D, WW">
+    <value>0, 0</value>
+  </data>
+  <data name="dxfLayout1.PlotPaperSize" type="WW.Math.Size2D, WW">
+    <value>0, 0</value>
+  </data>
+  <data name="dxfLayout1.PlotWindowArea" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAMAgAAAEZXVywgVmVyc2lvbj00LjAuMzcuMiwgQ3VsdHVyZT1uZXV0cmFs
+        LCBQdWJsaWNLZXlUb2tlbj04N2QxNmI4ZjdiNTMxYjY1BQEAAAAcV1cuTWF0aC5HZW9tZXRyeS5SZWN0
+        YW5nbGUyRAIAAAAHY29ybmVyMQdjb3JuZXIyBAQPV1cuTWF0aC5Qb2ludDJEAgAAAA9XVy5NYXRoLlBv
+        aW50MkQCAAAAAgAAAAX9////D1dXLk1hdGguUG9pbnQyRAIAAAABWAFZAAAGBgIAAAAAAAAAAAAAAAAA
+        AAAAAAAAAfz////9////AAAAAAAAAAAAAAAAAAAAAAs=
+</value>
+  </data>
+  <data name="dxfUcs1.Origin" type="WW.Math.Point3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicBackDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicBottomDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicFrontDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicLeftDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicRightDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.OrthographicTopDOrigin" type="WW.Math.Vector3D, WW">
+    <value>0, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.XAxis" type="WW.Math.Vector3D, WW">
+    <value>1, 0, 0</value>
+  </data>
+  <data name="dxfUcs1.YAxis" type="WW.Math.Vector3D, WW">
+    <value>0, 1, 0</value>
+  </data>
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAQAICAAAAEAIACoEAAARgAAABAQAAABACAAaAQAAO4QAAAYGAAAAQAgAIgJAABWFQAAICAAAAEA

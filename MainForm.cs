@@ -31,12 +31,13 @@ namespace WinFormsEditExample {
         {
             DxfModel model;
             model = new DxfModel();
-
-            DxfLine xaxis = new DxfLine(new Point2D(0d, 0d), new Point2D(10d, 0d));
+            double width = 100d;
+            double height = 100d;
+            DxfLine xaxis = new DxfLine(new Point2D(0d, 0d), new Point2D(width, 0d));
             xaxis.Color = EntityColors.LightGray;
             model.Entities.Add(xaxis);
 
-            DxfLine yaxis = new DxfLine(new Point2D(0d, 0d), new Point2D(0d, 10d));
+            DxfLine yaxis = new DxfLine(new Point2D(0d, 0d), new Point2D(0d, height));
             yaxis.Color = EntityColors.LightGray;
             model.Entities.Add(yaxis);
 
@@ -44,11 +45,11 @@ namespace WinFormsEditExample {
             originLabel.Color = EntityColors.GreenYellow;
             model.Entities.Add(originLabel);
 
-            DxfText xaxisLabel = new DxfText("10", new Point3D(10d, -1d, 0d), 0.5d);
+            DxfText xaxisLabel = new DxfText("10", new Point3D(width, -1d, 0d), 0.5d);
             xaxisLabel.Color = EntityColors.GreenYellow;
             model.Entities.Add(xaxisLabel);
 
-            DxfText yaxisLabel = new DxfText("10", new Point3D(-1, 10d, 0d), 0.5d);
+            DxfText yaxisLabel = new DxfText("10", new Point3D(-1, height, 0d), 0.5d);
             yaxisLabel.Color = EntityColors.GreenYellow;
             model.Entities.Add(yaxisLabel);
 
@@ -78,6 +79,13 @@ namespace WinFormsEditExample {
             );
             viewControl.ModelFishNet.Entities.Add(interactor.Entity);
             interactor.Entity.Color = EntityColors.Green;
+        }
+
+        private void addFishNetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var entities = NetCreator.Create(20, 10, 5, 6, 1);
+            viewControl.AddFishNet(entities);
+           
         }
     }
 }

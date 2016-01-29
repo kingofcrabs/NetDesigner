@@ -341,5 +341,13 @@ namespace WinFormsEditExample {
             );
         }
 
+
+        internal void AddFishNet(List<DxfEntity> entities)
+        {
+            modelFishNet.Entities.AddRange(entities.ToArray());
+            fishNetGraphics3D.Clear();
+            fishNetGraphics3D.CreateDrawables(modelFishNet);
+            Invalidate();
+        }
     }
 }
