@@ -42,8 +42,8 @@
       <HintPath>..\lib\OxyPlot.dll</HintPath>
     </Reference>
     <Reference Include="OxyPlot.Wpf, Version=1.0.0.0, Culture=neutral, PublicKeyToken=75e952ba404cdbb0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\OxyPlot.Wpf.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="OxyPlot.Xps, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\lib\OxyPlot.Xps.dll</HintPath>
@@ -78,6 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ViewModels\CuttingLineSeries.cs" />
     <Compile Include="NetCreator.cs" />
     <Compile Include="Polygon.cs" />
     <Compile Include="ViewModels\Model.cs" />
@@ -122,6 +123,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\diamond.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
