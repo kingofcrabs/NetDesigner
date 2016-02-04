@@ -26,7 +26,7 @@ namespace FishingNetDesigner.userControls
         public DefineFishingNet()
         {
             InitializeComponent();
-            Net = new FishingNet(1, 1, 10, 10, 1);
+            Net = new FishingNet(2, 3, 10, 10, 1);
             this.DataContext = Net;
         }
 
