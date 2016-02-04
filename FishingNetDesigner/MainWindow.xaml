@@ -6,7 +6,7 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
@@ -16,30 +16,8 @@
             </Grid.RowDefinitions>
             <oxy:PlotView x:Name="Plot1" Model="{Binding PlotModel}" DefaultTrackerTemplate="{x:Null}"    Margin="10">
             </oxy:PlotView>
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="2*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="1*"/>
-                    </Grid.RowDefinitions>
-                    <Label Grid.Column="0" Content="操作记录：" Margin="2,2,2,2"/>
-                    <Label Grid.Row="1" Grid.Column="0" Content="重复次数：" Margin="2,2,2,2"/>
-                    <TextBox Grid.Column="1" Grid.ColumnSpan="4" Name="txtOperations"  TextWrapping="Wrap" Text="" Margin="2,2,2,2"/>
-                    <TextBox Grid.Row="1" Name="txtRepeatTimes" Grid.Column="1"  Text="" Margin="2,2,2,2"/>
-                    <Button Grid.Row="1" Name="btnCut" Content="切割"  Grid.Column="2" Margin="2,2,2,2" Click="btnCut_Click"/>
-                </Grid>
-               
-
+            <Grid Grid.Row="1" Name="userControlHost">
+                
             </Grid>
             
 
@@ -47,10 +25,16 @@
         <Grid Grid.Column="1">
             <ToolBarTray >
                 <ToolBar Band="0" BandIndex="0">
-                    <Button>
+                    <Button Name="btnDefineFishingNet" Click="btnDefineFishingNet_Click">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock>定义网格</TextBlock>
-                            <Image Source="/FishingNetDesigner;component/images/diamond.jpg" />
+                            <TextBlock>定义渔网</TextBlock>
+                            <Image Source="/FishingNetDesigner;component/images/fishingNet.png" Width="64" Height="64"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="btnCutLine" Click="btnCutLine_Click">
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock>剪裁</TextBlock>
+                            <Image Source="/FishingNetDesigner;component/images/scissors.png" Width="64" Height="64"/>
                         </StackPanel>
                     </Button>
                 </ToolBar>

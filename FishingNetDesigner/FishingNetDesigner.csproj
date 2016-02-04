@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FishingNetDesigner</RootNamespace>
     <AssemblyName>FishingNetDesigner</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -52,6 +52,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -78,9 +79,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ViewModels\CuttingLineSeries.cs" />
-    <Compile Include="NetCreator.cs" />
-    <Compile Include="Polygon.cs" />
+    <Compile Include="data\bindableBase.cs" />
+    <Compile Include="userControls\DefineFishingNet.xaml.cs">
+      <DependentUpon>DefineFishingNet.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="userControls\EditCuttingLine.xaml.cs">
+      <DependentUpon>EditCuttingLine.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="data\CuttingLineSeries.cs" />
+    <Compile Include="data\FishingNet.cs" />
+    <Compile Include="data\Polygon.cs" />
     <Compile Include="ViewModels\Model.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -94,6 +102,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="userControls\DefineFishingNet.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="userControls\EditCuttingLine.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -125,7 +141,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="images\diamond.jpg" />
+    <Resource Include="images\fishingNet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\scissors.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

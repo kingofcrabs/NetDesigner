@@ -1,4 +1,5 @@
-﻿using OxyPlot;
+﻿using FishingNetDesigner.Data;
+using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
 using System;
@@ -37,77 +38,9 @@ namespace FishingNetDesigner.ViewModels
             timer.Start();
          }
 
-         void plotModel_KeyDown(object sender, OxyKeyEventArgs e)
-         {
-             ExpandCuttingLine(e.Key);
-         }
+        
 
-         private void ExpandCuttingLine(OxyKey key)
-         {
-             if (CuttingLineSeries.Instance.Current.Points.Count == 0)
-                 return;
-
-             double xOffSet = 0;
-             double yOffset = 0;
-          
-             CuttingOperation op = CuttingOperation.Up;
-             if (CuttingLineSeries.Instance.Current.Points[0].Y > fishingNet.HeightUnit * fishingNet.YNum)
-                 return;
-
-             bool isValidKey = GetOffSetAndOperation(key,ref xOffSet, ref yOffset, ref op);
-             if (!isValidKey)
-                 return;
-             
-             if (CuttingLineSeries.Instance.CanGo(xOffSet, yOffset))
-             {
-                 var currentPt = CuttingLineSeries.Instance.Current.Points[0];
-                 Point2D latestCurrent = new Point2D(currentPt.X + xOffSet, currentPt.Y + yOffset);
-                 var reachablePts = fishingNet.GetReachablePts(latestCurrent, new Point2D(currentPt.X, currentPt.Y));
-                 CuttingLineSeries.Instance.UpdateCurrent(latestCurrent, reachablePts, fishingNet.Thickness, true);
-                 if (onCutting != null)
-                     onCutting(op);
-                 plotModel.InvalidatePlot(false);
-             }
-         }
-
-         private bool GetOffSetAndOperation(OxyKey key, ref double xOffSet, ref double yOffset, ref CuttingOperation op)
-         {
-             double unitX = fishingNet.WidthUnit / 2;
-             double unitY = fishingNet.HeightUnit / 2;
-             bool validKey = true;
-             switch (key)
-             {
-                 case OxyKey.NumPad8://up
-                 case OxyKey.Up:
-                     yOffset = unitY;
-                     break;
-                 case OxyKey.Right:
-                 case OxyKey.NumPad6: //right
-                     xOffSet = unitX;
-                     op = CuttingOperation.Right;
-                     break;
-                 //case OxyKey.Left:
-                 //case OxyKey.NumPad4: //left
-                 //    xOffSet = -unitX;
-                 //    op = CuttingOperation.Left;
-                 //    break;
-                 case OxyKey.NumPad9: //up right
-                     xOffSet = unitX;
-                     yOffset = unitY;
-                     op = CuttingOperation.UpRight;
-                     break;
-                 //case OxyKey.NumPad7: //up left
-                 //    xOffSet = -unitX;
-                 //    yOffset = unitY;
-                 //    op = CuttingOperation.UpLeft;
-                 //    break;
-                 default:
-                     validKey = false;
-                     break;
-             }
-             return validKey;
-         }
-
+  
          void timer_Elapsed(object sender, ElapsedEventArgs e)
          {
              var pts = CuttingLineSeries.Instance.Reachable.Points;
@@ -121,7 +54,8 @@ namespace FishingNetDesigner.ViewModels
              plotModel.InvalidatePlot(false);
          }
 
-         private PlotModel SetUpModel()
+
+        private PlotModel SetUpModel()
          {
              PlotModel plotModel1 = new PlotModel();
              plotModel1.Title = "Fishing Net";
@@ -140,7 +74,18 @@ namespace FishingNetDesigner.ViewModels
              plotModel1.Axes.Add(linearAxis2);
              return plotModel1;
         }
-         OxyPlot.Series.LineSeries CreateDefaultLineSeries(double thickness)
+        private void AdjustAxes(double xMax, double yMax)
+        {
+            var max = Math.Max(xMax, yMax);
+            var xAxis = plotModel.Axes.First(x => x.Position == AxisPosition.Bottom);
+            xAxis.Maximum = max * 1.1;
+            xAxis.Minimum = -max * 0.1;
+            var yAxis = plotModel.Axes.First(x => x.Position != AxisPosition.Bottom);
+            yAxis.Maximum = max * 1.1;
+            yAxis.Minimum = -max * 0.1;
+        }
+
+        OxyPlot.Series.LineSeries CreateDefaultLineSeries(double thickness)
         {
             var lineSeries1 = new OxyPlot.Series.LineSeries();
             lineSeries1.Color = OxyColors.Black;
@@ -153,11 +98,50 @@ namespace FishingNetDesigner.ViewModels
             
             return lineSeries1;
         }
-        
+        #region interface
+        private void ExtentCuttingLine(OxyKey key)
+        {
+            if (CuttingLineSeries.Instance.Current.Points.Count == 0)
+                return;
+
+            double xOffSet = 0;
+            double yOffset = 0;
+
+            CuttingOperation op = CuttingOperation.Up;
+            if (CuttingLineSeries.Instance.Current.Points[0].Y > fishingNet.HeightUnit * fishingNet.YNum)
+                return;
+
+            bool isValidKey = GetOffSetAndOperation(key, ref xOffSet, ref yOffset, ref op);
+            if (!isValidKey)
+                return;
+
+            if (CuttingLineSeries.Instance.CanGo(xOffSet, yOffset))
+            {
+                var currentPt = CuttingLineSeries.Instance.Current.Points[0];
+                Point2D latestCurrent = new Point2D(currentPt.X + xOffSet, currentPt.Y + yOffset);
+                var reachablePts = fishingNet.GetReachablePts(latestCurrent, new Point2D(currentPt.X, currentPt.Y));
+                CuttingLineSeries.Instance.UpdateCurrent(latestCurrent, reachablePts, fishingNet.Thickness, true);
+                if (onCutting != null)
+                    onCutting(op);
+                plotModel.InvalidatePlot(false);
+            }
+        }
+        public void AddCell(double widthUnit, double heightUnit, double thickness)
+        {
+            AddFishingNet(1, 1, widthUnit, heightUnit, thickness);
+        }
+
+
+        internal void Expand(FishingNet net)
+        {
+            AddFishingNet(net.XNum, net.YNum, net.WidthUnit, net.HeightUnit, net.Thickness);
+        }
+
         public void AddFishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
             plotModel.Series.Clear();
-            var netLines = fishingNet.Create(xNum, yNum, xLen, yLen, thickness);
+            fishingNet = new FishingNet(xNum, yNum, xLen, yLen, thickness);
+            var netLines = fishingNet.Create();
             OxyPlot.Series.LineSeries lineSeries = CreateDefaultLineSeries(netLines.First().thickness);
             foreach (var line in netLines)
             {
@@ -170,19 +154,51 @@ namespace FishingNetDesigner.ViewModels
             CuttingLineSeries.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
             CuttingLineSeries.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
             lineSeries.MouseDown += lineSeries_MouseDown;
-           
+            plotModel.InvalidatePlot(false);
         }
-
-        private void AdjustAxes(double xMax, double yMax)
+        #endregion
+        #region keyboard & mouse
+        void plotModel_KeyDown(object sender, OxyKeyEventArgs e)
         {
-            var xAxis = plotModel.Axes.First(x => x.Position == AxisPosition.Bottom);
-            xAxis.Maximum = xMax * 1.1;
-            xAxis.Minimum = -xMax * 0.1;
-            var yAxis = plotModel.Axes.First(x => x.Position != AxisPosition.Bottom);
-            yAxis.Maximum = yMax * 1.1;
-            yAxis.Minimum = -yMax * 0.1;
+            ExtentCuttingLine(e.Key);
         }
-
+        private bool GetOffSetAndOperation(OxyKey key, ref double xOffSet, ref double yOffset, ref CuttingOperation op)
+        {
+            double unitX = fishingNet.WidthUnit / 2;
+            double unitY = fishingNet.HeightUnit / 2;
+            bool validKey = true;
+            switch (key)
+            {
+                case OxyKey.NumPad8://up
+                case OxyKey.Up:
+                    yOffset = unitY;
+                    break;
+                case OxyKey.Right:
+                case OxyKey.NumPad6: //right
+                    xOffSet = unitX;
+                    op = CuttingOperation.Right;
+                    break;
+                //case OxyKey.Left:
+                //case OxyKey.NumPad4: //left
+                //    xOffSet = -unitX;
+                //    op = CuttingOperation.Left;
+                //    break;
+                case OxyKey.NumPad9: //up right
+                    xOffSet = unitX;
+                    yOffset = unitY;
+                    op = CuttingOperation.UpRight;
+                    break;
+                //case OxyKey.NumPad7: //up left
+                //    xOffSet = -unitX;
+                //    yOffset = unitY;
+                //    op = CuttingOperation.UpLeft;
+                //    break;
+                default:
+                    validKey = false;
+                    break;
+            }
+            return validKey;
+        }
         void lineSeries_MouseDown(object sender, OxyMouseDownEventArgs e)
         {
             var lineSeries = (OxyPlot.Series.LineSeries)sender;
@@ -202,7 +218,6 @@ namespace FishingNetDesigner.ViewModels
             CuttingLineSeries.Instance.UpdateCurrent(anchorPt, reachablePts,fishingNet.Thickness);
             plotModel.InvalidatePlot(true);
         }
-
         private Point2D GetAnchorPos(DataPoint clickPoint)
         {
             double halfWidth = fishingNet.WidthUnit / 2.0d;
@@ -212,24 +227,22 @@ namespace FishingNetDesigner.ViewModels
             double y = quarterHeight;
             return new Point2D(x, y);
         }
-        
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-
         internal void ExecuteCutCommand(string commands, int repeatTimes)
         {
-            for (int i = 0; i < repeatTimes; i++ )
+            for (int i = 0; i < repeatTimes; i++)
             {
                 foreach (char ch in commands)
                 {
                     var key = ch.ToKey();
-                    ExpandCuttingLine(key);
+                    ExtentCuttingLine(key);
                 }
             }
+        }
+        #endregion
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -1,0 +1,52 @@
+﻿<UserControl x:Class="FishingNetDesigner.userControls.DefineFishingNet"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FishingNetDesigner.userControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="400">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontFamily" Value="SimSun"/>
+            </Style>
+            <Style TargetType="TextBox">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontFamily" Value="SimSun"/>
+            </Style>
+            <Style TargetType="Label">
+                <Setter Property="FontFamily" Value="SimSun" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+        </Grid.Resources>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+            <Label Content="宽：" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="24" Width="37"/>
+            <Label Content="高：" Grid.Column="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="24" Width="37"/>
+            <TextBox x:Name="txtWidth" Text="{Binding Path = WidthUnit}" HorizontalAlignment="Stretch" Height="23" Margin="52,5,5,0" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            <TextBox x:Name="txtHeight" Text="{Binding Path =HeightUnit}" Grid.Column="1" HorizontalAlignment="Stretch" Height="23" Margin="52,5,5,0" TextWrapping="Wrap"  VerticalAlignment="Top"/>
+            <Button x:Name="btnCell" Content="设置网格" Grid.Column="3" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Width="60" Click="btnCell_Click"/>
+            <Label Content="线重：" Grid.Column="2" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Height="24" Width="41"/>
+            <TextBox x:Name="txtThick" Text="{Binding Path= Thickness}" Grid.Column="2" HorizontalAlignment="Stretch" Height="23" Margin="52,5,5,0" TextWrapping="Wrap"  VerticalAlignment="Top"/>
+            <Label Content="横目：" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="24" Width="45"  Grid.Row="1"/>
+            <TextBox x:Name="txtXNum" HorizontalAlignment="Stretch" Height="24" Margin="52,5,5,0" TextWrapping="Wrap" Text="{Binding XNum}" VerticalAlignment="Top"  Grid.Row="1"/>
+            <TextBox x:Name="txtYNum" Grid.Column="1" HorizontalAlignment="Stretch" Height="24" Margin="52,5,5,0" TextWrapping="Wrap" Text="{Binding YNum}" VerticalAlignment="Top"  Grid.Row="1"/>
+            <Label Content="纵目：" Grid.Column="1" HorizontalAlignment="Left" Margin="5,5,0,0" VerticalAlignment="Top" Height="24" Width="42" Grid.Row="1"/>
+            <Button x:Name="btnExpand" Content="扩展" IsEnabled="False" Grid.Column="2" HorizontalAlignment="Left" Margin="10,5,0,0" VerticalAlignment="Top" Width="60" Grid.Row="1" Click="btnExpand_Click"/>
+
+      
+
+
+    </Grid>
+</UserControl>
