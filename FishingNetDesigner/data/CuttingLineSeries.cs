@@ -53,6 +53,8 @@ namespace FishingNetDesigner.Data
         public ScatterSeries Current { get; set; }
         public ScatterSeries Reachable { get; set; }
         public LineSeries Whole { get; set; }
+        public LineSeries SelectionBoundary { get; set; }
+        public double Thickness { get; set; }
         public static CuttingLineSeries Instance
         {
             get
@@ -67,16 +69,17 @@ namespace FishingNetDesigner.Data
         private CuttingLineSeries()
         {
             Current = new ScatterSeries { MarkerType = MarkerType.Circle, MarkerFill = OxyColors.Red };
-            Reachable = new ScatterSeries { MarkerType = MarkerType.Square, MarkerFill = OxyColors.Blue };
-            Whole = new LineSeries { Title = "Cutting Line"};
-            
-            Whole.Color = OxyColors.Red;
+            Reachable = new ScatterSeries { MarkerType = MarkerType.Square, MarkerFill = OxyColors.Green };
+            Whole = new LineSeries { Title = "Cutting Line", Color = OxyColors.Red };
+            SelectionBoundary = new LineSeries {Title= "Cutting Boundary",Color = OxyColors.Red };
         }
+
+
         public List<LineSeries> AllLineSeries
         {
             get
             {
-                return new List<LineSeries>() { Whole };
+                return new List<LineSeries>() { Whole,SelectionBoundary };
             }
         }
         public List<ScatterSeries> AllScatterSeries
@@ -92,17 +95,33 @@ namespace FishingNetDesigner.Data
             instance = new CuttingLineSeries();
         }
 
+        public void SelectSide(bool left,double maxX, double maxY)
+        {
+            if (Whole.Points.Count < 2)
+                throw new Exception("剪裁点数小于2！");
+            DataPoint ptStart = Whole.Points.Last();
+            DataPoint ptTop = new DataPoint(ptStart.X, maxY);
+            SelectionBoundary.Points.Clear();
+            SelectionBoundary.Points.Add(ptStart);
+            SelectionBoundary.Points.Add(ptTop);
+            double sidePos = left ? 0 : maxX;
+            SelectionBoundary.Points.Add(new DataPoint(sidePos, ptTop.Y));
+            SelectionBoundary.Points.Add(new DataPoint(sidePos,0));
+            SelectionBoundary.Points.Add(new DataPoint(Whole.Points.First().X, 0));
+            SelectionBoundary.Points.Add(Whole.Points.First());
+        }
    
         public void UpdateCurrent(Point2D currentPt, List<Point2D> reachablePts, double thickness, bool fromKeyboard = false)
         {
             Current.Points.Clear();
-            var scatterPt = new ScatterPoint(currentPt.X, currentPt.Y, thickness);
+            Thickness = thickness * 2;
+            var scatterPt = new ScatterPoint(currentPt.X, currentPt.Y, Thickness);
             Current.Points.Add(scatterPt);
             Reachable.Points.Clear();
 
             foreach(var pt in reachablePts)
             {
-                Reachable.Points.Add(new ScatterPoint(pt.X,pt.Y,thickness));
+                Reachable.Points.Add(new ScatterPoint(pt.X, pt.Y, Thickness));
             }
             if (!fromKeyboard) //user create a new cutting line
                 Whole.Points.Clear();
@@ -122,5 +141,7 @@ namespace FishingNetDesigner.Data
         {
             return pt.X == currentPt.X + xOffSet && pt.Y == currentPt.Y + yOffSet;
         }
+
+        public string DeleteSide { get; set; }
     }
 }

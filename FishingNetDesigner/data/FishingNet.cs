@@ -41,7 +41,6 @@ namespace FishingNetDesigner.Data
             }
 
         }
-
         public int YNum
         {
             get
@@ -53,7 +52,6 @@ namespace FishingNetDesigner.Data
                 SetProperty(ref yNum, value);
             }
         }
-
         public double Thickness
         {
             get
@@ -65,9 +63,6 @@ namespace FishingNetDesigner.Data
                 SetProperty(ref thickness, value);
             }
         }
-
-        
-
         public double WidthUnit 
         {
             get
@@ -79,7 +74,6 @@ namespace FishingNetDesigner.Data
                 SetProperty(ref xLen, value);
             }
         }
-
         public double HeightUnit
         {
             get
@@ -92,13 +86,11 @@ namespace FishingNetDesigner.Data
             }
         }
 
-        public List<Point2D> CuttingLine { get; set; }
         public List<Line> GeneratedLines { get; set; }
         #endregion
 
         public FishingNet()
         {
-            CuttingLine = new List<Point2D>();
             GeneratedLines = null;
         }
 
@@ -109,7 +101,6 @@ namespace FishingNetDesigner.Data
             this.xLen = xLen;
             this.yLen = yLen;
             this.thickness = thickness;
-            CuttingLine = new List<Point2D>();
             GeneratedLines = null;
         }
         public  List<Line> CreateCell()
@@ -217,5 +208,53 @@ namespace FishingNetDesigner.Data
             pts.Remove(invalidPt);
             return pts;
         }
+
+        public List<Line> DeleteHalf(string side,List<Point2D> cuttingLine)
+        {
+            List<Line> survivedLines = new List<Line>();
+            Dictionary<int, double> eachLayerCuttingPositions = new Dictionary<int, double>();
+            cuttingLine.ForEach(pt => CalculateEachLayer(pt, eachLayerCuttingPositions, side));
+            GeneratedLines.ForEach(l => CheckThenAdd(survivedLines, l,side == "L", eachLayerCuttingPositions));
+            return survivedLines;
+        }
+
+        private void CalculateEachLayer(Point2D pt, Dictionary<int, double> eachLayerCuttingPositions, string side)
+        {
+            int layerIndex = GetLayer(pt.Y);
+            if (eachLayerCuttingPositions.ContainsKey(layerIndex))
+            {
+                if (side == "L" && pt.X < eachLayerCuttingPositions[layerIndex]) //left, update the point even left
+                {
+                    eachLayerCuttingPositions[layerIndex] = pt.X;
+                }
+                if (side == "R" && pt.X > eachLayerCuttingPositions[layerIndex])// right, update the point even right
+                {
+                    eachLayerCuttingPositions[layerIndex] = pt.X;
+                }
+            }
+            else
+                eachLayerCuttingPositions.Add(layerIndex, pt.X);
+        }
+
+        private int GetLayer(double yPos)
+        {
+            return (int)(yPos / (HeightUnit / 2));
+        }
+
+        private void CheckThenAdd(List<Line> survivedLines, Line l, bool wantBigger, Dictionary<int, double> eachLayerCuttingPositions)
+        {
+            Point2D middlePt = new Point2D((l.ptStart.X + l.ptEnd.X) / 2, (l.ptStart.Y + l.ptEnd.Y) / 2);
+            int layer = GetLayer(middlePt.Y);
+            if (!eachLayerCuttingPositions.ContainsKey(layer))
+                return;
+            bool bValid = false;
+            if (wantBigger && middlePt.X > eachLayerCuttingPositions[layer])
+                bValid = true;
+            if (!wantBigger && middlePt.X < eachLayerCuttingPositions[layer])
+                bValid = true;
+            if (bValid)
+                survivedLines.Add(l);
+        }
+
     }
 }

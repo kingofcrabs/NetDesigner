@@ -27,13 +27,13 @@
                 <ToolBar Band="0" BandIndex="0">
                     <Button Name="btnDefineFishingNet" Click="btnDefineFishingNet_Click">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock>定义渔网</TextBlock>
+                            <TextBlock Name="textBlockDefine">定义渔网</TextBlock>
                             <Image Source="/FishingNetDesigner;component/images/fishingNet.png" Width="64" Height="64"/>
                         </StackPanel>
                     </Button>
                     <Button Name="btnCutLine" Click="btnCutLine_Click">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock>剪裁</TextBlock>
+                            <TextBlock Name="textBlockCutting">剪裁</TextBlock>
                             <Image Source="/FishingNetDesigner;component/images/scissors.png" Width="64" Height="64"/>
                         </StackPanel>
                     </Button>

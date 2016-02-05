@@ -38,9 +38,6 @@ namespace FishingNetDesigner.ViewModels
             timer.Start();
          }
 
-        
-
-  
          void timer_Elapsed(object sender, ElapsedEventArgs e)
          {
              var pts = CuttingLineSeries.Instance.Reachable.Points;
@@ -48,13 +45,12 @@ namespace FishingNetDesigner.ViewModels
                  return;
              
              var curSize = pts[0].Size;
-             double boldThickness =  fishingNet.Thickness * 1.2;
-             var newSize = curSize == fishingNet.Thickness ?  boldThickness : fishingNet.Thickness;
+             double boldThickness =  CuttingLineSeries.Instance.Thickness * 2;
+             var newSize = curSize == boldThickness ? CuttingLineSeries.Instance.Thickness : boldThickness;
              pts.ForEach(x => x.Size = newSize);
              plotModel.InvalidatePlot(false);
          }
-
-
+        #region render
         private PlotModel SetUpModel()
          {
              PlotModel plotModel1 = new PlotModel();
@@ -84,7 +80,6 @@ namespace FishingNetDesigner.ViewModels
             yAxis.Maximum = max * 1.1;
             yAxis.Minimum = -max * 0.1;
         }
-
         OxyPlot.Series.LineSeries CreateDefaultLineSeries(double thickness)
         {
             var lineSeries1 = new OxyPlot.Series.LineSeries();
@@ -98,7 +93,9 @@ namespace FishingNetDesigner.ViewModels
             
             return lineSeries1;
         }
+        #endregion
         #region interface
+        public Stage CurrentStage { get; set; }
         private void ExtentCuttingLine(OxyKey key)
         {
             if (CuttingLineSeries.Instance.Current.Points.Count == 0)
@@ -130,27 +127,32 @@ namespace FishingNetDesigner.ViewModels
         {
             AddFishingNet(1, 1, widthUnit, heightUnit, thickness);
         }
-
-
         internal void Expand(FishingNet net)
         {
             AddFishingNet(net.XNum, net.YNum, net.WidthUnit, net.HeightUnit, net.Thickness);
         }
-
         public void AddFishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
-            plotModel.Series.Clear();
             fishingNet = new FishingNet(xNum, yNum, xLen, yLen, thickness);
             var netLines = fishingNet.Create();
+            UpdateLines(netLines);
+        }
+        private void UpdateLines(List<Line> netLines)
+        {
+            plotModel.Series.Clear();
             OxyPlot.Series.LineSeries lineSeries = CreateDefaultLineSeries(netLines.First().thickness);
+            double maxX = 0, maxY =0;
             foreach (var line in netLines)
             {
+                maxX = Math.Max(Math.Max(line.ptStart.X, line.ptEnd.X), maxX);
+                maxY = Math.Max(Math.Max(line.ptStart.Y, line.ptEnd.Y), maxY);
                 lineSeries.Points.Add(new DataPoint(line.ptStart.X, line.ptStart.Y));
-                lineSeries.Points.Add(new DataPoint(line.ptEnd.X,line.ptEnd.Y));
+                lineSeries.Points.Add(new DataPoint(line.ptEnd.X, line.ptEnd.Y));
                 lineSeries.Points.Add(new DataPoint(double.NaN, double.NaN));
             }
-            AdjustAxes(xNum * xLen, yNum * yLen);
+            AdjustAxes(maxX, maxY);
             plotModel.Series.Add(lineSeries);
+            CuttingLineSeries.Instance.Reset();
             CuttingLineSeries.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
             CuttingLineSeries.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
             lineSeries.MouseDown += lineSeries_MouseDown;
@@ -160,8 +162,41 @@ namespace FishingNetDesigner.ViewModels
         #region keyboard & mouse
         void plotModel_KeyDown(object sender, OxyKeyEventArgs e)
         {
-            ExtentCuttingLine(e.Key);
+            if (CurrentStage == Stage.Cutting)
+            {
+                    if(e.Key == OxyKey.L || e.Key == OxyKey.R && e.IsControlDown)
+                    {
+                        Selection2DeleteBoundary(e.Key);
+                        return;
+                    }
+                    if(e.Key == OxyKey.Delete)
+                    {
+                        if (CuttingLineSeries.Instance.SelectionBoundary.Points.Count == 0)
+                            throw new Exception("请先选择要删除的边！");
+                        DeleteHalf();
+                    }
+                    ExtentCuttingLine(e.Key);
+            }
         }
+
+        private void DeleteHalf()
+        {
+            List<Point2D> cuttingLine = new List<Point2D>();
+            CuttingLineSeries.Instance.Whole.Points.ForEach(pt => cuttingLine.Add(new Point2D(pt.X, pt.Y)));
+            List<Line> remainLines = fishingNet.DeleteHalf(CuttingLineSeries.Instance.DeleteSide, cuttingLine);
+            UpdateLines(remainLines);
+        }
+
+        private void Selection2DeleteBoundary(OxyKey oxyKey)
+        {
+            double totalWidth = fishingNet.XNum * fishingNet.WidthUnit;
+            double totalHeight = fishingNet.YNum * fishingNet.HeightUnit;
+            CuttingLineSeries.Instance.DeleteSide = oxyKey.ToString();
+            CuttingLineSeries.Instance.SelectSide(oxyKey == OxyKey.L, totalWidth, totalHeight);
+            plotModel.InvalidatePlot(false);
+        }
+
+
         private bool GetOffSetAndOperation(OxyKey key, ref double xOffSet, ref double yOffset, ref CuttingOperation op)
         {
             double unitX = fishingNet.WidthUnit / 2;
@@ -201,22 +236,27 @@ namespace FishingNetDesigner.ViewModels
         }
         void lineSeries_MouseDown(object sender, OxyMouseDownEventArgs e)
         {
-            var lineSeries = (OxyPlot.Series.LineSeries)sender;
+            if (CurrentStage == Stage.Cutting)
+            {
+                ProcessCutting((OxyPlot.Series.LineSeries)sender,e);
+            }
+        }
+
+        private void ProcessCutting(OxyPlot.Series.LineSeries lineSeries, OxyMouseDownEventArgs e)
+        {
             DataPoint clickPoint = lineSeries.InverseTransform(e.Position);
             if (clickPoint.Y > fishingNet.HeightUnit)
                 return;
 
-            if(fishingNet.GeneratedLines == null || fishingNet.GeneratedLines.Count == 0)
+            if (fishingNet.GeneratedLines == null || fishingNet.GeneratedLines.Count == 0)
             {
                 throw new Exception("未定义渔网结构！");
             }
-   
+
             var anchorPt = GetAnchorPos(clickPoint);
-            fishingNet.CuttingLine.Clear();
-            fishingNet.CuttingLine.Add(anchorPt);
-            List<Point2D> reachablePts = fishingNet.GetReachablePts(anchorPt,new Point2D(-1,-1));
-            CuttingLineSeries.Instance.UpdateCurrent(anchorPt, reachablePts,fishingNet.Thickness);
-            plotModel.InvalidatePlot(true);
+            List<Point2D> reachablePts = fishingNet.GetReachablePts(anchorPt, new Point2D(-1, -1));
+            CuttingLineSeries.Instance.UpdateCurrent(anchorPt, reachablePts, fishingNet.Thickness);
+            plotModel.InvalidatePlot(false);
         }
         private Point2D GetAnchorPos(DataPoint clickPoint)
         {
@@ -244,5 +284,11 @@ namespace FishingNetDesigner.ViewModels
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+    }
+
+    public enum Stage
+    {
+        Define,
+        Cutting
     }
 }
