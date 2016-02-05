@@ -77,7 +77,7 @@ namespace FishingNetDesigner
                 case Stage.Define:
                     return btnDefineFishingNet;
                 default:
-                    throw new Exception("找不当当前步骤对应的控件！");
+                    throw new Exception("找不到当前步骤对应的控件！");
 
             }
         }
@@ -90,7 +90,7 @@ namespace FishingNetDesigner
                 case Stage.Define:
                     return defineFishingNetUserControl;
                 default:
-                    throw new Exception("找不当当前步骤对应的控件！");
+                    throw new Exception("找不到当前步骤对应的控件！");
 
             }
         }
