@@ -80,6 +80,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="data\bindableBase.cs" />
+    <Compile Include="data\Dwg.cs" />
+    <Compile Include="data\memo.cs" />
     <Compile Include="userControls\DefineFishingNet.xaml.cs">
       <DependentUpon>DefineFishingNet.xaml</DependentUpon>
     </Compile>
@@ -89,6 +91,7 @@
     <Compile Include="data\CuttingLineSeries.cs" />
     <Compile Include="data\FishingNet.cs" />
     <Compile Include="data\Polygon.cs" />
+    <Compile Include="userControls\stageControl.cs" />
     <Compile Include="ViewModels\Model.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -141,6 +144,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\scissors.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\save.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

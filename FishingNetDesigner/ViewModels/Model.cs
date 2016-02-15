@@ -1,4 +1,5 @@
-﻿using FishingNetDesigner.Data;
+﻿using FishingNetDesigner.data;
+using FishingNetDesigner.Data;
 using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
@@ -9,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Timers;
+using System.Windows.Input;
 using System.Windows.Media;
 using WW.Math;
 
@@ -131,6 +133,11 @@ namespace FishingNetDesigner.ViewModels
         {
             AddFishingNet(net.XNum, net.YNum, net.WidthUnit, net.HeightUnit, net.Thickness);
         }
+
+        private void CheckValidity(FishingNet net)
+        {
+            throw new NotImplementedException();
+        }
         public void AddFishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
             fishingNet = new FishingNet(xNum, yNum, xLen, yLen, thickness);
@@ -160,22 +167,49 @@ namespace FishingNetDesigner.ViewModels
         }
         #endregion
         #region keyboard & mouse
+        //internal void InvokeKeyDown(System.Windows.Input.KeyEventArgs e)
+        //{
+        //    OxyKeyEventArgs oxyKeyEvent = new OxyKeyEventArgs();
+            
+        //    if(e.Key == Key.R || e.Key == Key.L && IsControlDown())
+        //    {
+        //        oxyKeyEvent.Key = e.Key == Key.R ? OxyKey.R : OxyKey.L;
+        //        oxyKeyEvent.ModifierKeys = OxyModifierKeys.Control;
+        //    }
+        //    onKeyDown(oxyKeyEvent);
+        //}
+
+        bool IsControlDown()
+        {
+            return (Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control;
+        }
+
         void plotModel_KeyDown(object sender, OxyKeyEventArgs e)
+        {
+            onKeyDown(e);
+          
+            //if(e.Key == OxyKey.S && e.IsControlDown)
+            //{
+            //    Dwg.Save("f:\\test.dwg", Memo.Instance.HistoryLines.Last().Value);
+            //}
+        }
+
+        private void onKeyDown(OxyKeyEventArgs e)
         {
             if (CurrentStage == Stage.Cutting)
             {
-                    if(e.Key == OxyKey.L || e.Key == OxyKey.R && e.IsControlDown)
-                    {
-                        Selection2DeleteBoundary(e.Key);
-                        return;
-                    }
-                    if(e.Key == OxyKey.Delete)
-                    {
-                        if (CuttingLineSeries.Instance.SelectionBoundary.Points.Count == 0)
-                            throw new Exception("请先选择要删除的边！");
-                        DeleteHalf();
-                    }
-                    ExtentCuttingLine(e.Key);
+                if (e.Key == OxyKey.L || e.Key == OxyKey.R && e.IsControlDown)
+                {
+                    Selection2DeleteBoundary(e.Key);
+                    return;
+                }
+                if (e.Key == OxyKey.Delete)
+                {
+                    if (CuttingLineSeries.Instance.SelectionBoundary.Points.Count == 0)
+                        throw new Exception("请先选择要删除的边！");
+                    DeleteHalf();
+                }
+                ExtentCuttingLine(e.Key);
             }
         }
 
@@ -284,6 +318,8 @@ namespace FishingNetDesigner.ViewModels
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
+
+      
     }
 
     public enum Stage

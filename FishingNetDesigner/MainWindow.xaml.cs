@@ -1,4 +1,5 @@
-﻿using FishingNetDesigner.userControls;
+﻿using FishingNetDesigner.data;
+using FishingNetDesigner.userControls;
 using FishingNetDesigner.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -32,11 +33,29 @@ namespace FishingNetDesigner
             viewModel = new ViewModels.Model();
             editCuttingLineUserControl = new EditCuttingLine(viewModel);
             defineFishingNetUserControl = new DefineFishingNet(viewModel);
+            defineFishingNetUserControl.onNavigation += defineFishingNetUserControl_onNavigation;
+            defineFishingNetUserControl.onNotify += defineFishingNetUserControl_onNotify;
             DataContext = viewModel;
             this.Loaded += MainWindow_Loaded;
         }
 
-      
+
+
+        void SetInfo(string s, bool isError = true)
+        {
+            txtInfo.Foreground = isError ? Brushes.Red : Brushes.Black;
+            txtInfo.Text = s;
+        }
+
+        void defineFishingNetUserControl_onNotify(string info)
+        {
+            SetInfo(info);
+        }
+
+        void defineFishingNetUserControl_onNavigation(Stage dstStage)
+        {
+            Navigate(dstStage);
+        }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
@@ -47,15 +66,15 @@ namespace FishingNetDesigner
         #region navigation
         private void btnCutLine_Click(object sender, RoutedEventArgs e)
         {
-            onChangeUserControl(Stage.Cutting);
+            Navigate(Stage.Cutting);
 
         }
         private void btnDefineFishingNet_Click(object sender, RoutedEventArgs e)
         {
-            onChangeUserControl(Stage.Define);
+            Navigate(Stage.Define);
         }
 
-        private void onChangeUserControl(Stage curStage)
+        private void Navigate(Stage curStage)
         {
             userControlHost.Children.Clear();
             userControlHost.Children.Add(GetCurrentControl(curStage));
@@ -97,6 +116,26 @@ namespace FishingNetDesigner
 
       
         #endregion
+
+        private void btnExport_Click(object sender, RoutedEventArgs e)
+        {
+            string filePath = OpenDialog();
+            if (filePath != "")
+                Dwg.Save(filePath, Memo.Instance.HistoryLines.Last().Value);
+        }
+
+        private string OpenDialog()
+        {
+            Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
+            // Set filter for file extension and default file extension 
+            dlg.DefaultExt = ".dwg";
+            dlg.FileName = "test";
+            dlg.Filter = "AutoCAD Files (*.dwg)|*.dwg";
+            // Display OpenFileDialog by calling ShowDialog method 
+            bool bok = (bool)dlg.ShowDialog();
+            return bok ? dlg.FileName : "";
+
+        }
     }
 
   

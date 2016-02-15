@@ -18,7 +18,7 @@ namespace FishingNetDesigner.userControls
     /// <summary>
     /// Interaction logic for EditCuttingLine.xaml
     /// </summary>
-    public partial class EditCuttingLine : UserControl
+    public partial class EditCuttingLine : StageControl
     {
         ViewModels.Model viewModel;
         public EditCuttingLine()
@@ -39,7 +39,15 @@ namespace FishingNetDesigner.userControls
 
         private void btnCut_Click(object sender, RoutedEventArgs e)
         {
-            onCut();
+            try
+            {
+                onCut();
+            }
+            catch(Exception ex)
+            {
+                NotifyInformation("剪切时发生错误！" + ex.Message);
+            }
+            
         }
 
         private void onCut()
@@ -53,7 +61,7 @@ namespace FishingNetDesigner.userControls
             if (!bok)
                 throw new Exception("重复次数必须为数字！");
 
-            if (repeatTimes < 0)
+            if (repeatTimes <= 0)
                 throw new Exception("重复次数必须大于0！");
             viewModel.ExecuteCutCommand(txtOperations.Text, repeatTimes);
         }

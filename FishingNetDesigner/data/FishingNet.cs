@@ -1,4 +1,5 @@
-﻿using FishingNetDesigner.Data;
+﻿using FishingNetDesigner.data;
+using FishingNetDesigner.Data;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -21,6 +22,7 @@ namespace FishingNetDesigner.Data
             this.thickness = thickness;
         }
     }
+    
     class FishingNet: BindableBase
     {
         int xNum;
@@ -163,6 +165,7 @@ namespace FishingNetDesigner.Data
                     lines.Add(line2);
                 }
             }
+            Memo.Instance.Create(lines);
             GeneratedLines = lines;
             return lines;
         }
@@ -215,6 +218,7 @@ namespace FishingNetDesigner.Data
             Dictionary<int, double> eachLayerCuttingPositions = new Dictionary<int, double>();
             cuttingLine.ForEach(pt => CalculateEachLayer(pt, eachLayerCuttingPositions, side));
             GeneratedLines.ForEach(l => CheckThenAdd(survivedLines, l,side == "L", eachLayerCuttingPositions));
+            Memo.Instance.Update(survivedLines);
             return survivedLines;
         }
 
