@@ -1,4 +1,4 @@
-﻿using FishingNetDesigner.data;
+﻿using FishingNetDesigner.Data;
 using FishingNetDesigner.Data;
 using System;
 using System.Collections.Generic;
@@ -87,23 +87,34 @@ namespace FishingNetDesigner.Data
                 SetProperty(ref yLen, value);
             }
         }
+        static FishingNet instance = null;
 
-        public List<Line> GeneratedLines { get; set; }
+        public List<Line> Current { get; set; }
         #endregion
 
         public FishingNet()
         {
-            GeneratedLines = null;
+            Current = null;
+        }
+        public static FishingNet Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new FishingNet();
+                return instance;
+            }
         }
 
-        public FishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
+   
+        private FishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
             this.xNum = xNum;
             this.yNum = yNum;
             this.xLen = xLen;
             this.yLen = yLen;
             this.thickness = thickness;
-            GeneratedLines = null;
+            Current = null;
         }
         public  List<Line> CreateCell()
         {
@@ -119,8 +130,9 @@ namespace FishingNetDesigner.Data
                 new Line(ptRight, ptTop,thickness)
             };
         }
-        public List<Line> Create()
+        public List<Line> Create(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
+            instance = new FishingNet(xNum, yNum, xLen, yLen, thickness);
             if (xNum == 1 && yNum == 1)
                 return CreateCell();
             List<Line> lines = new List<Line>();
@@ -166,7 +178,7 @@ namespace FishingNetDesigner.Data
                 }
             }
             Memo.Instance.Create(lines);
-            GeneratedLines = lines;
+            Current = lines;
             return lines;
         }
   
@@ -196,18 +208,18 @@ namespace FishingNetDesigner.Data
             {
                 pts.Add(new Point2D(anchorPt.X + xLen/2, anchorPt.Y + yLen/2));
             }
-            //if(!mostLeft && !mostTop && canGoUpLeft) //go ↖
-            //{
-            //    pts.Add(new Point2D(anchorPt.X - xLen/2, anchorPt.Y + yLen/2));
-            //}
+            if (!mostLeft && !mostTop && canGoUpLeft) //go ↖
+            {
+                pts.Add(new Point2D(anchorPt.X - xLen / 2, anchorPt.Y + yLen / 2));
+            }
             if( !mostRight)// go right
             {
                 pts.Add(new Point2D(anchorPt.X + xLen/2, anchorPt.Y));
             }
-            //if( !mostLeft && canGoUpLeft) //go left
-            //{
-            //    pts.Add(new Point2D(anchorPt.X - xLen/2, anchorPt.Y));
-            //}
+            if (!mostLeft) //go left
+            {
+                pts.Add(new Point2D(anchorPt.X - xLen / 2, anchorPt.Y));
+            }
             pts.Remove(invalidPt);
             return pts;
         }
@@ -217,7 +229,7 @@ namespace FishingNetDesigner.Data
             List<Line> survivedLines = new List<Line>();
             Dictionary<int, double> eachLayerCuttingPositions = new Dictionary<int, double>();
             cuttingLine.ForEach(pt => CalculateEachLayer(pt, eachLayerCuttingPositions, side));
-            GeneratedLines.ForEach(l => CheckThenAdd(survivedLines, l,side == "L", eachLayerCuttingPositions));
+            Current.ForEach(l => CheckThenAdd(survivedLines, l,side == "L", eachLayerCuttingPositions));
             Memo.Instance.Update(survivedLines);
             return survivedLines;
         }
@@ -260,5 +272,27 @@ namespace FishingNetDesigner.Data
                 survivedLines.Add(l);
         }
 
+
+        internal bool IsInside(OxyPlot.DataPoint clickPoint)
+        {
+            var xMax = xNum * WidthUnit;
+            var yMax = yNum * HeightUnit;
+            var x = clickPoint.X;
+            var y = clickPoint.Y;
+            return x < xMax && x > 0 && y > 0 && y < yMax;
+        }
+
+        internal Point2D GetAnchorPos(Point2D pt)
+        {
+            double halfWidth = WidthUnit / 2.0d;
+            double halfHeight = HeightUnit / 2.0d;
+            double quarterHeight = HeightUnit / 4.0d;
+            double firstLineOffset = WidthUnit / 4.0d;
+            double x = (int)(Math.Round((pt.X - firstLineOffset) / halfWidth)) * halfWidth + firstLineOffset;
+            double y = (int)(pt.Y / halfHeight) * halfHeight + quarterHeight;
+            return new Point2D(x, y);
+        }
+
+        
     }
 }

@@ -10,6 +10,10 @@
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <ToolBarTray >
                 <ToolBar Band="0" BandIndex="0">
                     <Button Name="btnDefineFishingNet" Click="btnDefineFishingNet_Click">
@@ -36,6 +40,31 @@
                 </ToolBar>
                 
             </ToolBarTray>
+            <Grid Grid.Row="1" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <Grid Name="cuttingApproach" Visibility="{Binding Path=CuttingSubCommandsVisible}">
+                    <ToolBarTray >
+                        <ToolBar Band="0" BandIndex="0">
+                            <Button Name="btnCutByPolygon" Click="btnCutByPolygon_Click">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock>多边形</TextBlock>
+                                    <Image Source="/FishingNetDesigner;component/images/polygon.png" Width="64" Height="64"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Name="btnDeleteOneSide" Click="btnDeleteOneSide_Click">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock>删除一半</TextBlock>
+                                    <Image Source="/FishingNetDesigner;component/images/half.jpg" Width="64" Height="64"/>
+                                </StackPanel>
+                            </Button>
+                        </ToolBar>
+                    </ToolBarTray>
+                </Grid>
+            </Grid>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
@@ -46,10 +75,7 @@
             <oxy:PlotView x:Name="Plot1" Model="{Binding PlotModel}" DefaultTrackerTemplate="{x:Null}"    Margin="10">
             </oxy:PlotView>
             <Grid Grid.Row="1" Name="userControlHost">
-                
             </Grid>
-            
-
         </Grid>
         <GridSplitter Grid.Column="1" Width="5"/>
         <Grid Grid.Column="2">

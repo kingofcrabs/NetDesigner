@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FishingNetDesigner.data
+namespace FishingNetDesigner.Data
 {
     class Memo
     {

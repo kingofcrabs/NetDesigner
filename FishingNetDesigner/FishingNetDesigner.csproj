@@ -82,15 +82,16 @@
     <Compile Include="data\bindableBase.cs" />
     <Compile Include="data\Dwg.cs" />
     <Compile Include="data\memo.cs" />
+    <Compile Include="data\CommandController.cs" />
     <Compile Include="userControls\DefineFishingNet.xaml.cs">
       <DependentUpon>DefineFishingNet.xaml</DependentUpon>
     </Compile>
-    <Compile Include="userControls\EditCuttingLine.xaml.cs">
-      <DependentUpon>EditCuttingLine.xaml</DependentUpon>
+    <Compile Include="userControls\CuttingDeleteHalf.xaml.cs">
+      <DependentUpon>CuttingDeleteHalf.xaml</DependentUpon>
     </Compile>
-    <Compile Include="data\CuttingLineSeries.cs" />
+    <Compile Include="operation\CuttingBySide.cs" />
     <Compile Include="data\FishingNet.cs" />
-    <Compile Include="data\Polygon.cs" />
+    <Compile Include="operation\CuttingByPolygon.cs" />
     <Compile Include="userControls\stageControl.cs" />
     <Compile Include="ViewModels\Model.cs" />
     <Page Include="MainWindow.xaml">
@@ -109,7 +110,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="userControls\EditCuttingLine.xaml">
+    <Page Include="userControls\CuttingDeleteHalf.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -147,6 +148,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="images\save.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\half.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="images\polygon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,4 +1,4 @@
-﻿using FishingNetDesigner.data;
+﻿using FishingNetDesigner.Data;
 using FishingNetDesigner.userControls;
 using FishingNetDesigner.ViewModels;
 using System;
@@ -24,29 +24,29 @@ namespace FishingNetDesigner
     {
         private ViewModels.Model viewModel;
         #region usercontrols
-        EditCuttingLine editCuttingLineUserControl = null;
+        CuttingDeleteHalf editCuttingLineUserControl = null;
         DefineFishingNet defineFishingNetUserControl = null;
+        CommandController commandController = new CommandController();
         #endregion
         public MainWindow()
         {
             InitializeComponent();
             viewModel = new ViewModels.Model();
-            editCuttingLineUserControl = new EditCuttingLine(viewModel);
+            editCuttingLineUserControl = new CuttingDeleteHalf(viewModel);
             defineFishingNetUserControl = new DefineFishingNet(viewModel);
             defineFishingNetUserControl.onNavigation += defineFishingNetUserControl_onNavigation;
             defineFishingNetUserControl.onNotify += defineFishingNetUserControl_onNotify;
+            cuttingApproach.DataContext = commandController;
             DataContext = viewModel;
             this.Loaded += MainWindow_Loaded;
         }
-
-
 
         void SetInfo(string s, bool isError = true)
         {
             txtInfo.Foreground = isError ? Brushes.Red : Brushes.Black;
             txtInfo.Text = s;
         }
-
+        #region userControl event handler
         void defineFishingNetUserControl_onNotify(string info)
         {
             SetInfo(info);
@@ -54,9 +54,11 @@ namespace FishingNetDesigner
 
         void defineFishingNetUserControl_onNavigation(Stage dstStage)
         {
-            Navigate(dstStage);
+            Navigate(dstStage,SubStage.Dummy);
         }
+        #endregion
 
+        
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //viewModel.AddFishingNet(40, 10, 5, 5, 3);
@@ -66,30 +68,62 @@ namespace FishingNetDesigner
         #region navigation
         private void btnCutLine_Click(object sender, RoutedEventArgs e)
         {
-            Navigate(Stage.Cutting);
+            Navigate(Stage.Cutting,SubStage.Polygon);
 
         }
         private void btnDefineFishingNet_Click(object sender, RoutedEventArgs e)
         {
-            Navigate(Stage.Define);
+            Navigate(Stage.Define,SubStage.Dummy);
         }
 
-        private void Navigate(Stage curStage)
+        private void btnCutByPolygon_Click(object sender, RoutedEventArgs e)
+        {
+            Navigate(Stage.Cutting, SubStage.Polygon);
+        }
+
+        private void btnDeleteOneSide_Click(object sender, RoutedEventArgs e)
+        {
+            Navigate(Stage.Cutting, SubStage.Half);
+        }
+        private void Navigate(Stage mainStage,SubStage subStage)
         {
             userControlHost.Children.Clear();
-            userControlHost.Children.Add(GetCurrentControl(curStage));
+            var curUserControl = GetCurrentControl(mainStage, subStage);
+            if(curUserControl != null)
+                userControlHost.Children.Add(curUserControl);
             List<Button> stageBtns = new List<Button>() { btnCutLine, btnDefineFishingNet };
-            var dstButton = GetCurrentButton(curStage);
+            List<Button> subStageBtns = new List<Button>() { btnCutByPolygon,btnDeleteOneSide };
+            
             SolidColorBrush white = new SolidColorBrush(Colors.White);
             SolidColorBrush blue = new SolidColorBrush(Colors.LightBlue);
-            viewModel.CurrentStage = curStage;
             stageBtns.ForEach(x => x.Background = white);
+            subStageBtns.ForEach(x => x.Background = white);
+            var dstButton = GetStageButton(mainStage);
             dstButton.Background = blue;
+            var subStageBtn = GetStageButton(subStage);
+            if (subStageBtn != null)
+                subStageBtn.Background = blue;
+            viewModel.CurMainStage = mainStage;
+            viewModel.CurSubStage = subStage;
+            commandController.CuttingSubCommandsVisible = mainStage == Stage.Cutting ? Visibility.Visible : Visibility.Hidden;
+                
         }
-
-        Button GetCurrentButton(Stage currentStage)
+        Button GetStageButton(SubStage subStage)
         {
-            switch (currentStage)
+            switch (subStage)
+            {
+                case SubStage.Half:
+                    return btnDeleteOneSide;
+                case SubStage.Polygon:
+                    return btnCutByPolygon;
+                default:
+                    return null;
+
+            }
+        }
+        Button GetStageButton(Stage mainStage)
+        {
+            switch (mainStage)
             {
                 case Stage.Cutting:
                     return btnCutLine;
@@ -100,18 +134,16 @@ namespace FishingNetDesigner
 
             }
         }
-        UserControl GetCurrentControl(Stage currentStage)
+        UserControl GetCurrentControl(Stage mainStage,SubStage subStage)
         {
-            switch(currentStage)
+            if (mainStage == Stage.Define)
+                return defineFishingNetUserControl;
+            if( mainStage == Stage.Cutting)
             {
-                case Stage.Cutting:
+                if (subStage == SubStage.Half)
                     return editCuttingLineUserControl;
-                case Stage.Define:
-                    return defineFishingNetUserControl;
-                default:
-                    throw new Exception("找不到当前步骤对应的控件！");
-
             }
+            return null;
         }
 
       
@@ -119,6 +151,11 @@ namespace FishingNetDesigner
 
         private void btnExport_Click(object sender, RoutedEventArgs e)
         {
+            if(Memo.Instance.HistoryLines.Count == 0)
+            {
+                SetInfo("无可以导出的数据！");
+                return;
+            }
             string filePath = OpenDialog();
             if (filePath != "")
                 Dwg.Save(filePath, Memo.Instance.HistoryLines.Last().Value);
@@ -136,7 +173,12 @@ namespace FishingNetDesigner
             return bok ? dlg.FileName : "";
 
         }
+
+        
     }
+
+
+
 
   
 }
