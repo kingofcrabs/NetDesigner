@@ -1,4 +1,4 @@
-﻿using FishingNetDesigner.Data;
+﻿using FishingNetDesigner.data;
 using FishingNetDesigner.Data;
 using OxyPlot;
 using OxyPlot.Axes;
@@ -99,7 +99,28 @@ namespace FishingNetDesigner.ViewModels
         #endregion
         #region interface
         public Stage CurMainStage { get; set; }
-        public SubStage CurSubStage { get; set; }
+        SubStage curSubStage;
+        public SubStage CurSubStage
+        {
+            get
+            {
+                return curSubStage;
+            }
+            set
+            {
+                curSubStage = value;
+                ClearCuttingLines();
+            }
+        }
+
+        private void ClearCuttingLines()
+        {
+            CuttingBySide.Instance.Clear();
+            CuttingByPolygon.Instance.Reset();
+            plotModel.InvalidatePlot(true);
+        }
+
+       
         private void ExtendCuttingLine(OxyKey key)
         {
             CuttingOperation op = CuttingOperation.Up;
@@ -125,7 +146,8 @@ namespace FishingNetDesigner.ViewModels
         }
         public void AddFishingNet(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
-            var netLines  = FishingNet.Instance.Create(xNum, yNum, xLen, yLen, thickness);
+            FishingNet.Instance.Create(xNum, yNum, xLen, yLen, thickness);
+            var netLines = FishingNet.Instance.Generate();
             UpdateLines(netLines);
         }
         private void UpdateLines(List<Line> netLines)
@@ -143,18 +165,11 @@ namespace FishingNetDesigner.ViewModels
             }
             AdjustAxes(maxX, maxY);
             plotModel.Series.Add(lineSeries);
-            if(CurSubStage == SubStage.Half)
-            {
-                CuttingBySide.Instance.Reset();
-                CuttingBySide.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
-                CuttingBySide.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
-            }
-            else if(CurSubStage == SubStage.Polygon)
-            {
-                CuttingPolygon.Instance.Reset();
-                CuttingPolygon.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
-            }
-            
+            CuttingBySide.Instance.Clear();
+            CuttingBySide.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
+            CuttingBySide.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
+            CuttingByPolygon.Instance.Reset();
+            CuttingByPolygon.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
             lineSeries.MouseDown += lineSeries_MouseDown;
             plotModel.InvalidatePlot(false);
         }
@@ -174,7 +189,6 @@ namespace FishingNetDesigner.ViewModels
         {
             onKeyDownCuttingByPolygon(e);
             onKeyDownCuttingBySide(e);
-            
         }
 
         private void onKeyDownCuttingByPolygon(OxyKeyEventArgs e)

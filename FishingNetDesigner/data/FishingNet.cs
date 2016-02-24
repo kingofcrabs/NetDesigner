@@ -1,4 +1,4 @@
-﻿using FishingNetDesigner.Data;
+﻿using FishingNetDesigner.data;
 using FishingNetDesigner.Data;
 using System;
 using System.Collections.Generic;
@@ -114,7 +114,7 @@ namespace FishingNetDesigner.Data
             this.xLen = xLen;
             this.yLen = yLen;
             this.thickness = thickness;
-            Current = null;
+            Current = new List<Line>();
         }
         public  List<Line> CreateCell()
         {
@@ -130,12 +130,21 @@ namespace FishingNetDesigner.Data
                 new Line(ptRight, ptTop,thickness)
             };
         }
-        public List<Line> Create(int xNum, int yNum, double xLen, double yLen, double thickness)
+
+        public FishingNet Create(int xNum, int yNum, double xLen, double yLen, double thickness)
         {
             instance = new FishingNet(xNum, yNum, xLen, yLen, thickness);
+            return instance;
+        }
+
+        public List<Line> Generate()
+        {
             if (xNum == 1 && yNum == 1)
-                return CreateCell();
-            List<Line> lines = new List<Line>();
+            {
+                Current = CreateCell();
+                return Current;
+            }
+            List<Line> lines = new List<Line>();    
             List<List<Point2D>> ptsVector = new List<List<Point2D>>();
             int rowCnt = yNum * 2 + 1;
             for (int row = 0; row < rowCnt; row++)

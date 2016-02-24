@@ -50,7 +50,18 @@ namespace FishingNetDesigner.Data
     class CuttingBySide
     {
         private static CuttingBySide instance = null;
-        public ScatterSeries Current { get; set; }
+        ScatterSeries current;
+        public ScatterSeries Current
+        {
+            get
+            {
+                return current;
+            }
+            set
+            {
+                current = value;
+            }
+        }
         public ScatterSeries Reachable { get; set; }
         public LineSeries Whole { get; set; }
         public LineSeries SelectionBoundary { get; set; }
@@ -90,9 +101,12 @@ namespace FishingNetDesigner.Data
             }
         }
 
-        internal void Reset()
+        internal void Clear()
         {
-            instance = new CuttingBySide();
+            Reachable.Points.Clear();
+            Whole.Points.Clear();
+            Current.Points.Clear();
+            SelectionBoundary.Points.Clear();
         }
 
         public void SelectSide(bool left)

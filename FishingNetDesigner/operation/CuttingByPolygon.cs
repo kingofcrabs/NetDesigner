@@ -7,24 +7,24 @@ using OxyPlot.Series;
 
 namespace FishingNetDesigner.Data
 {
-    class CuttingPolygon
+    class CuttingByPolygon
     {
-        private static CuttingPolygon instance;
+        private static CuttingByPolygon instance;
         public List<Point2D> Points { get; set; }
         public OxyPlot.Series.LineSeries Whole { get; set; }
 
-        private CuttingPolygon()
+        private CuttingByPolygon()
         {
             Points = new List<Point2D>();
             Whole = new LineSeries { MarkerType = MarkerType.Circle, MarkerFill = OxyColors.Red };
         }
 
-        public static CuttingPolygon Instance
+        public static CuttingByPolygon Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new CuttingPolygon();
+                    instance = new CuttingByPolygon();
                 return instance;
             }
         }
@@ -80,7 +80,7 @@ namespace FishingNetDesigner.Data
         }
         internal void Reset()
         {
-            instance = new CuttingPolygon();
+            instance = new CuttingByPolygon();
         }
     }
 }

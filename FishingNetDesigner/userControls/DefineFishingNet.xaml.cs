@@ -13,7 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using FishingNetDesigner.ViewModels;
 using FishingNetDesigner.Data;
-using FishingNetDesigner.Data;
+using FishingNetDesigner.data;
 
 namespace FishingNetDesigner.userControls
 {
@@ -27,8 +27,8 @@ namespace FishingNetDesigner.userControls
         public DefineFishingNet()
         {
             InitializeComponent();
-            FishingNet.Instance.Create(2, 3, 10, 10, 1);
-            this.DataContext = FishingNet.Instance;
+            Net = FishingNet.Instance.Create(2, 3, 10, 10, 1);
+            this.DataContext = Net;
         }
 
         public DefineFishingNet(Model viewModel):this()

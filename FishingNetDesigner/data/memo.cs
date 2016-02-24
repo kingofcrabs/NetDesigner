@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FishingNetDesigner.Data
+namespace FishingNetDesigner.data
 {
     class Memo
     {
@@ -28,7 +28,10 @@ namespace FishingNetDesigner.Data
         }
         public void Create(List<Line> lines)
         {
-            HistoryLines.Add(Generated, lines);
+            if (HistoryLines.ContainsKey(Generated))
+                HistoryLines[Generated] = lines;
+            else
+                HistoryLines.Add(Generated, lines);
         }
 
         public void Update(List<Line> lines)

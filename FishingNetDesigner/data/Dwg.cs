@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FishingNetDesigner.Data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using WW.Cad.Model;
 using WW.Cad.Model.Entities;
 using WW.Math;
 
-namespace FishingNetDesigner.Data
+namespace FishingNetDesigner.data
 {
     class Dwg
     {
