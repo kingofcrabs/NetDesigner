@@ -48,7 +48,7 @@ namespace FishingNetDesigner.Data
                     return OxyKey.NumPad6;
                 case 'B':
                     return OxyKey.NumPad9;
-                case '7'
+                case '7':
                     return OxyKey.NumPad7;
                 case '4':
                     return OxyKey.NumPad4;
