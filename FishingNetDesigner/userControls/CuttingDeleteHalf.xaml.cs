@@ -29,10 +29,10 @@ namespace FishingNetDesigner.userControls
         public CuttingDeleteHalf(ViewModels.Model viewModel):this()
         {
             this.viewModel = viewModel;
-            viewModel.onCutting += viewModel_onCutting;
+            CuttingBySide.Instance.onCutting += Instance_onCutting;
         }
 
-        void viewModel_onCutting(CuttingOperation op)
+        void Instance_onCutting(CuttingOperation op)
         {
             txtOperations.Text += op.ToFriendlyString();
         }
@@ -47,7 +47,6 @@ namespace FishingNetDesigner.userControls
             {
                 NotifyInformation("剪切时发生错误！" + ex.Message);
             }
-            
         }
 
         private void onCut()

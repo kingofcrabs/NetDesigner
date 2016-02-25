@@ -1,4 +1,5 @@
-﻿using OxyPlot;
+﻿using FishingNetDesigner.data;
+using OxyPlot;
 using OxyPlot.Series;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,9 @@ namespace FishingNetDesigner.Data
     {
         Up = 0,
         Right = 1,
-        UpRight = 2
+        UpRight = 2,
+        Left,
+        UpLeft
     }
     public static class CuttingOperationExt
     {
@@ -26,6 +29,10 @@ namespace FishingNetDesigner.Data
                     return "N";
                 case CuttingOperation.UpRight:
                     return "B";
+                case CuttingOperation.Left:
+                    return "4";
+                case CuttingOperation.UpLeft:
+                    return "7";
                 default:
                     throw new Exception("unknown CuttingOperation enum type!");
             }
@@ -41,6 +48,10 @@ namespace FishingNetDesigner.Data
                     return OxyKey.NumPad6;
                 case 'B':
                     return OxyKey.NumPad9;
+                case '7'
+                    return OxyKey.NumPad7;
+                case '4':
+                    return OxyKey.NumPad4;
                 default:
                     throw new Exception("unknown CuttingOperation enum type!");
             }
@@ -49,6 +60,11 @@ namespace FishingNetDesigner.Data
 
     class CuttingBySide
     {
+        #region cutting event
+        public delegate void onCuttingLine(CuttingOperation op);
+        public event onCuttingLine onCutting;
+        #endregion
+
         private static CuttingBySide instance = null;
         ScatterSeries current;
         public ScatterSeries Current
@@ -81,8 +97,8 @@ namespace FishingNetDesigner.Data
         {
             Current = new ScatterSeries { MarkerType = MarkerType.Circle, MarkerFill = OxyColors.Red };
             Reachable = new ScatterSeries { MarkerType = MarkerType.Square, MarkerFill = OxyColors.Green };
-            Whole = new LineSeries { Title = "Cutting Line", Color = OxyColors.Red };
-            SelectionBoundary = new LineSeries {Title= "Cutting Boundary",Color = OxyColors.Red };
+            Whole = new LineSeries { Color = OxyColors.Red };
+            SelectionBoundary = new LineSeries {Color = OxyColors.Red };
         }
 
 
@@ -153,7 +169,7 @@ namespace FishingNetDesigner.Data
 
         public string DeleteSide { get; set; }
 
-        internal bool Extend(OxyKey key,ref CuttingOperation op)
+        internal bool Extend(OxyKey key)
         {
             if (Current.Points.Count == 0)
                 return false;
@@ -161,7 +177,7 @@ namespace FishingNetDesigner.Data
             double xOffSet = 0;
             double yOffset = 0;
             double maxY = FishingNet.Instance.HeightUnit * FishingNet.Instance.YNum;
-            op = CuttingOperation.Up;
+            CuttingOperation op = CuttingOperation.Up;
             if (CuttingBySide.Instance.Current.Points[0].Y > maxY)
                 return false;
 
@@ -176,6 +192,8 @@ namespace FishingNetDesigner.Data
                 Point2D latestCurrent = new Point2D(currentPt.X + xOffSet, currentPt.Y + yOffset);
                 var reachablePts = FishingNet.Instance.GetReachablePts(latestCurrent, new Point2D(currentPt.X, currentPt.Y));
                 CuttingBySide.Instance.UpdateCurrent(latestCurrent, reachablePts, true);
+                if (onCutting != null)
+                    onCutting(op);
             }
             return bCango;
         }
@@ -187,9 +205,6 @@ namespace FishingNetDesigner.Data
             var currentPt = Current.Points[0];
             return Reachable.Points.Exists(pt => IsSamePt(pt, currentPt, xOffSet, yOffSet));
         }
-
-   
-
 
         private bool GetOffSetAndOperation(OxyKey key, ref double xOffSet, ref double yOffset, ref CuttingOperation op)
         {
@@ -207,21 +222,21 @@ namespace FishingNetDesigner.Data
                     xOffSet = unitX;
                     op = CuttingOperation.Right;
                     break;
-                //case OxyKey.Left:
-                //case OxyKey.NumPad4: //left
-                //    xOffSet = -unitX;
-                //    op = CuttingOperation.Left;
-                //    break;
+                case OxyKey.Left:
+                case OxyKey.NumPad4: //left
+                    xOffSet = -unitX;
+                    op = CuttingOperation.Left;
+                    break;
                 case OxyKey.NumPad9: //up right
                     xOffSet = unitX;
                     yOffset = unitY;
                     op = CuttingOperation.UpRight;
                     break;
-                //case OxyKey.NumPad7: //up left
-                //    xOffSet = -unitX;
-                //    yOffset = unitY;
-                //    op = CuttingOperation.UpLeft;
-                //    break;
+                case OxyKey.NumPad7: //up left
+                    xOffSet = -unitX;
+                    yOffset = unitY;
+                    op = CuttingOperation.UpLeft;
+                    break;
                 default:
                     validKey = false;
                     break;
@@ -241,6 +256,57 @@ namespace FishingNetDesigner.Data
             Point2D anchorPt = FishingNet.Instance.GetAnchorPos(new Point2D(clickPoint.X, clickPoint.Y));
             List<Point2D> reachablePts = FishingNet.Instance.GetReachablePts(anchorPt, new Point2D(-1, -1));
             CuttingBySide.Instance.UpdateCurrent(anchorPt, reachablePts);
+        }
+
+
+        public List<Line> Delete()
+        {
+            List<Line> survivedLines = new List<Line>();
+            Dictionary<int, double> eachLayerCuttingPositions = new Dictionary<int, double>();
+            Whole.Points.ForEach(pt => CalculateEachLayer(pt, eachLayerCuttingPositions, DeleteSide));
+            FishingNet.Instance.Current.ForEach(l => CheckThenAdd(survivedLines, l, DeleteSide == "L", eachLayerCuttingPositions));
+            Memo.Instance.Update(survivedLines);
+            return survivedLines;
+        }
+
+     
+
+        private void CalculateEachLayer(DataPoint pt, Dictionary<int, double> eachLayerCuttingPositions, string side)
+        {
+            int layerIndex = GetLayer(pt.Y);
+            if (eachLayerCuttingPositions.ContainsKey(layerIndex))
+            {
+                if (side == "L" && pt.X < eachLayerCuttingPositions[layerIndex]) //left, update the point even left
+                {
+                    eachLayerCuttingPositions[layerIndex] = pt.X;
+                }
+                if (side == "R" && pt.X > eachLayerCuttingPositions[layerIndex])// right, update the point even right
+                {
+                    eachLayerCuttingPositions[layerIndex] = pt.X;
+                }
+            }
+            else
+                eachLayerCuttingPositions.Add(layerIndex, pt.X);
+        }
+
+        private int GetLayer(double yPos)
+        {
+            return (int)(yPos / (FishingNet.Instance.HeightUnit / 2));
+        }
+
+        private void CheckThenAdd(List<Line> survivedLines, Line l, bool wantBigger, Dictionary<int, double> eachLayerCuttingPositions)
+        {
+            Point2D middlePt = new Point2D((l.ptStart.X + l.ptEnd.X) / 2, (l.ptStart.Y + l.ptEnd.Y) / 2);
+            int layer = GetLayer(middlePt.Y);
+            if (!eachLayerCuttingPositions.ContainsKey(layer))
+                return;
+            bool bValid = false;
+            if (wantBigger && middlePt.X > eachLayerCuttingPositions[layer])
+                bValid = true;
+            if (!wantBigger && middlePt.X < eachLayerCuttingPositions[layer])
+                bValid = true;
+            if (bValid)
+                survivedLines.Add(l);
         }
     }
 }

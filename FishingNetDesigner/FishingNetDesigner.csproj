@@ -83,6 +83,10 @@
     <Compile Include="data\Dwg.cs" />
     <Compile Include="data\memo.cs" />
     <Compile Include="data\CommandController.cs" />
+    <Compile Include="data\Polygon.cs" />
+    <Compile Include="userControls\CuttingDeletePolygon.xaml.cs">
+      <DependentUpon>CuttingDeletePolygon.xaml</DependentUpon>
+    </Compile>
     <Compile Include="userControls\DefineFishingNet.xaml.cs">
       <DependentUpon>DefineFishingNet.xaml</DependentUpon>
     </Compile>
@@ -106,6 +110,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="userControls\CuttingDeletePolygon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="userControls\DefineFishingNet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

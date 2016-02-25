@@ -24,7 +24,8 @@ namespace FishingNetDesigner
     {
         private ViewModels.Model viewModel;
         #region usercontrols
-        CuttingDeleteHalf editCuttingLineUserControl = null;
+        CuttingDeleteHalf delHalfUserControl = null;
+        CuttingDeletePolygon delPolygonUserControl = null;
         DefineFishingNet defineFishingNetUserControl = null;
         CommandController commandController = new CommandController();
         #endregion
@@ -32,7 +33,8 @@ namespace FishingNetDesigner
         {
             InitializeComponent();
             viewModel = new ViewModels.Model();
-            editCuttingLineUserControl = new CuttingDeleteHalf(viewModel);
+            delHalfUserControl = new CuttingDeleteHalf(viewModel);
+            delPolygonUserControl = new CuttingDeletePolygon(viewModel);
             defineFishingNetUserControl = new DefineFishingNet(viewModel);
             defineFishingNetUserControl.onNavigation += defineFishingNetUserControl_onNavigation;
             defineFishingNetUserControl.onNotify += defineFishingNetUserControl_onNotify;
@@ -54,16 +56,14 @@ namespace FishingNetDesigner
 
         void defineFishingNetUserControl_onNavigation(Stage dstStage)
         {
-            Navigate(dstStage,SubStage.Dummy);
+            Navigate(dstStage,SubStage.Polygon);
         }
         #endregion
 
         
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //viewModel.AddFishingNet(40, 10, 5, 5, 3);
         }
-      
 
         #region navigation
         private void btnCutLine_Click(object sender, RoutedEventArgs e)
@@ -141,7 +141,9 @@ namespace FishingNetDesigner
             if( mainStage == Stage.Cutting)
             {
                 if (subStage == SubStage.Half)
-                    return editCuttingLineUserControl;
+                    return delHalfUserControl;
+                if (subStage == SubStage.Polygon)
+                    return delPolygonUserControl;
             }
             return null;
         }
