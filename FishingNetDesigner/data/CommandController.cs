@@ -29,10 +29,10 @@ namespace FishingNetDesigner.data
         Define,
         Cutting
     }
-    public enum SubStage
-    {
-        Polygon,
-        Half,
-        Dummy,
-    }
+    //public enum SubStage
+    //{
+    //    Polygon,
+    //    Half,
+    //    Dummy,
+    //}
 }

@@ -24,8 +24,7 @@ namespace FishingNetDesigner
     {
         private ViewModels.Model viewModel;
         #region usercontrols
-        CuttingDeleteHalf delHalfUserControl = null;
-        CuttingDeletePolygon delPolygonUserControl = null;
+        CuttingDeleteInsidePolygon delHalfUserControl = null;
         DefineFishingNet defineFishingNetUserControl = null;
         CommandController commandController = new CommandController();
         #endregion
@@ -33,8 +32,7 @@ namespace FishingNetDesigner
         {
             InitializeComponent();
             viewModel = new ViewModels.Model();
-            delHalfUserControl = new CuttingDeleteHalf(viewModel);
-            delPolygonUserControl = new CuttingDeletePolygon(viewModel);
+            delHalfUserControl = new CuttingDeleteInsidePolygon(viewModel);
             defineFishingNetUserControl = new DefineFishingNet(viewModel);
             defineFishingNetUserControl.onNavigation += defineFishingNetUserControl_onNavigation;
             defineFishingNetUserControl.onNotify += defineFishingNetUserControl_onNotify;
@@ -56,7 +54,7 @@ namespace FishingNetDesigner
 
         void defineFishingNetUserControl_onNavigation(Stage dstStage)
         {
-            Navigate(dstStage,SubStage.Polygon);
+            Navigate(dstStage);
         }
         #endregion
 
@@ -68,27 +66,19 @@ namespace FishingNetDesigner
         #region navigation
         private void btnCutLine_Click(object sender, RoutedEventArgs e)
         {
-            Navigate(Stage.Cutting,SubStage.Polygon);
+            Navigate(Stage.Cutting);
 
         }
         private void btnDefineFishingNet_Click(object sender, RoutedEventArgs e)
         {
-            Navigate(Stage.Define,SubStage.Dummy);
+            Navigate(Stage.Define);
         }
 
-        private void btnCutByPolygon_Click(object sender, RoutedEventArgs e)
-        {
-            Navigate(Stage.Cutting, SubStage.Polygon);
-        }
-
-        private void btnDeleteOneSide_Click(object sender, RoutedEventArgs e)
-        {
-            Navigate(Stage.Cutting, SubStage.Half);
-        }
-        private void Navigate(Stage mainStage,SubStage subStage)
+        
+        private void Navigate(Stage mainStage)
         {
             userControlHost.Children.Clear();
-            var curUserControl = GetCurrentControl(mainStage, subStage);
+            var curUserControl = GetCurrentControl(mainStage);
             if(curUserControl != null)
                 userControlHost.Children.Add(curUserControl);
             List<Button> stageBtns = new List<Button>() { btnCutLine, btnDefineFishingNet };
@@ -100,27 +90,28 @@ namespace FishingNetDesigner
             subStageBtns.ForEach(x => x.Background = white);
             var dstButton = GetStageButton(mainStage);
             dstButton.Background = blue;
-            var subStageBtn = GetStageButton(subStage);
-            if (subStageBtn != null)
-                subStageBtn.Background = blue;
+            //var subStageBtn = GetStageButton(subStage);
+            //if (subStageBtn != null)
+            //    subStageBtn.Background = blue;
             viewModel.CurMainStage = mainStage;
-            viewModel.CurSubStage = subStage;
+            //viewModel.CurSubStage = subStage;
             commandController.CuttingSubCommandsVisible = mainStage == Stage.Cutting ? Visibility.Visible : Visibility.Hidden;
-                
         }
-        Button GetStageButton(SubStage subStage)
-        {
-            switch (subStage)
-            {
-                case SubStage.Half:
-                    return btnDeleteOneSide;
-                case SubStage.Polygon:
-                    return btnCutByPolygon;
-                default:
-                    return null;
 
-            }
-        }
+        //Button GetStageButton(SubStage subStage)
+        //{
+        //    switch (subStage)
+        //    {
+        //        case SubStage.Half:
+        //            return btnDeleteOneSide;
+        //        case SubStage.Polygon:
+        //            return btnCutByPolygon;
+        //        default:
+        //            return null;
+
+        //    }
+        //}
+
         Button GetStageButton(Stage mainStage)
         {
             switch (mainStage)
@@ -134,16 +125,17 @@ namespace FishingNetDesigner
 
             }
         }
-        UserControl GetCurrentControl(Stage mainStage,SubStage subStage)
+        UserControl GetCurrentControl(Stage mainStage)
         {
             if (mainStage == Stage.Define)
                 return defineFishingNetUserControl;
             if( mainStage == Stage.Cutting)
             {
-                if (subStage == SubStage.Half)
-                    return delHalfUserControl;
-                if (subStage == SubStage.Polygon)
-                    return delPolygonUserControl;
+                //if (subStage == SubStage.Half)
+                //    return delHalfUserControl;
+                //if (subStage == SubStage.Polygon)
+                //    return delPolygonUserControl;
+                return delHalfUserControl;
             }
             return null;
         }

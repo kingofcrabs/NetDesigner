@@ -200,14 +200,15 @@ namespace FishingNetDesigner.Data
             int yIndex = (int)Math.Round((y-yLen/4) / (yLen/2));
             bool isOnLowerEdge = yIndex % 2 == 0;
             bool isOnLeftEdge = xIndex % 2 == 0;
-            bool canGoUpRight;
-            canGoUpRight = isOnLowerEdge == isOnLeftEdge; //on left,low edge or on right,upper edge we can go ↗
+            bool canGoUpRight = isOnLowerEdge == isOnLeftEdge; //on left,low edge or on right,upper edge we can go ↗
             bool canGoUpLeft = !canGoUpRight;
+            bool canGoDownLeft = canGoUpRight;
+            bool canGoDownRight = canGoUpLeft;
             double eps = 0.000001;
             bool mostRight = Math.Abs(x + xLen / 4 - xLen * xNum) < eps;
             bool mostLeft = Math.Abs(x - xLen / 4) < eps;
             bool mostTop = Math.Abs(y + yLen / 4 - yLen * yNum) < eps;
-
+            bool mostBottom = y < yLen / 2;
             List<Point2D> pts = new List<Point2D>();
             if(!mostTop) //go ↑
             {
@@ -229,6 +230,19 @@ namespace FishingNetDesigner.Data
             {
                 pts.Add(new Point2D(anchorPt.X - xLen / 2, anchorPt.Y));
             }
+            if(!mostBottom) //go down
+            {
+                pts.Add(new Point2D(anchorPt.X, anchorPt.Y - yLen / 2));
+            }
+            if(!mostBottom && !mostLeft && canGoDownLeft)
+            {
+                pts.Add(new Point2D(anchorPt.X - xLen / 2, anchorPt.Y - yLen / 2));
+            }
+            if (!mostBottom && !mostRight && canGoDownRight)
+            {
+                pts.Add(new Point2D(anchorPt.X + xLen / 2, anchorPt.Y - yLen / 2));
+            }
+
             pts.Remove(invalidPt);
             return pts;
         }

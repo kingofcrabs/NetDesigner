@@ -40,7 +40,7 @@
                 </ToolBar>
                 
             </ToolBarTray>
-            <Grid Grid.Row="1" >
+            <Grid Grid.Row="1" Visibility="Hidden" >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
@@ -49,13 +49,13 @@
                 <Grid Name="cuttingApproach" Visibility="{Binding Path=CuttingSubCommandsVisible}">
                     <ToolBarTray >
                         <ToolBar Band="0" BandIndex="0">
-                            <Button Name="btnCutByPolygon" Click="btnCutByPolygon_Click">
+                            <Button Name="btnCutByPolygon" >
                                 <StackPanel Orientation="Vertical">
                                     <TextBlock>多边形</TextBlock>
                                     <Image Source="/FishingNetDesigner;component/images/polygon.png" Width="64" Height="64"/>
                                 </StackPanel>
                             </Button>
-                            <Button Name="btnDeleteOneSide" Click="btnDeleteOneSide_Click">
+                            <Button Name="btnDeleteOneSide" >
                                 <StackPanel Orientation="Vertical">
                                     <TextBlock>删除一半</TextBlock>
                                     <Image Source="/FishingNetDesigner;component/images/half.jpg" Width="64" Height="64"/>

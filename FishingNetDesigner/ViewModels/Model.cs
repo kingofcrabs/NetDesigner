@@ -21,7 +21,6 @@ namespace FishingNetDesigner.ViewModels
          public event PropertyChangedEventHandler PropertyChanged;
          private PlotModel plotModel;
          Timer timer = new Timer(1000);
-  
          public PlotModel PlotModel 
          { 
              get { return plotModel; } 
@@ -38,13 +37,13 @@ namespace FishingNetDesigner.ViewModels
 
          void timer_Elapsed(object sender, ElapsedEventArgs e)
          {
-             var pts = CuttingBySide.Instance.Reachable.Points;
+             var pts = CuttingInsidePolygon.Instance.Reachable.Points;
              if (pts.Count == 0)
                  return;
              
              var curSize = pts[0].Size;
-             double boldThickness =  CuttingBySide.Instance.Thickness * 2;
-             var newSize = curSize == boldThickness ? CuttingBySide.Instance.Thickness : boldThickness;
+             double boldThickness =  CuttingInsidePolygon.Instance.Thickness * 2;
+             var newSize = curSize == boldThickness ? CuttingInsidePolygon.Instance.Thickness : boldThickness;
              pts.ForEach(x => x.Size = newSize);
              plotModel.InvalidatePlot(false);
          }
@@ -96,31 +95,15 @@ namespace FishingNetDesigner.ViewModels
         #endregion
         #region interface
         public Stage CurMainStage { get; set; }
-        SubStage curSubStage;
-        public SubStage CurSubStage
-        {
-            get
-            {
-                return curSubStage;
-            }
-            set
-            {
-                curSubStage = value;
-                ClearCuttingLines();
-            }
-        }
-
         public void ClearCuttingLines()
         {
-            CuttingBySide.Instance.Clear();
-            CuttingByPolygon.Instance.Clear();
+            CuttingInsidePolygon.Instance.Clear();
             plotModel.InvalidatePlot(true);
         }
-
        
         private void ExtendCuttingLine(OxyKey key)
         {
-            bool bok = CuttingBySide.Instance.Extend(key);
+            bool bok = CuttingInsidePolygon.Instance.Extend(key);
             if (bok)
                plotModel.InvalidatePlot(false);
         }
@@ -132,7 +115,6 @@ namespace FishingNetDesigner.ViewModels
         {
             AddFishingNet(net.XNum, net.YNum, net.WidthUnit, net.HeightUnit, net.Thickness);
         }
-
         private void CheckValidity(FishingNet net)
         {
             throw new NotImplementedException();
@@ -158,11 +140,11 @@ namespace FishingNetDesigner.ViewModels
             }
             AdjustAxes(maxX, maxY);
             plotModel.Series.Add(lineSeries);
-            CuttingBySide.Instance.Clear();
-            CuttingBySide.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
-            CuttingBySide.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
-            CuttingByPolygon.Instance.Clear();
-            CuttingByPolygon.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
+            CuttingInsidePolygon.Instance.Clear();
+            CuttingInsidePolygon.Instance.AllScatterSeries.ForEach(x => plotModel.Series.Add(x));
+            CuttingInsidePolygon.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
+            //CuttingByPolygon.Instance.Clear();
+            //CuttingByPolygon.Instance.AllLineSeries.ForEach(x => plotModel.Series.Add(x));
             lineSeries.MouseDown += lineSeries_MouseDown;
             plotModel.InvalidatePlot(false);
         }
@@ -180,20 +162,27 @@ namespace FishingNetDesigner.ViewModels
 
         private void onKeyDown(OxyKeyEventArgs e)
         {
-            onKeyDownCuttingByPolygon(e);
-            onKeyDownCuttingBySide(e);
+            //onKeyDownCuttingByPolygon(e);
+            onKeyDownCuttingInsidePolygon(e);
         }
         private void CompletePolygon()
         {
-            CuttingByPolygon.Instance.Complete();
+            CuttingInsidePolygon.Instance.Complete();
             plotModel.InvalidatePlot(false);
         }
 
-        private void onKeyDownCuttingByPolygon(OxyKeyEventArgs e)
+     
+
+        private void onKeyDownCuttingInsidePolygon(OxyKeyEventArgs e)
         {
-            bool cuttingByPolygon = CurMainStage == Stage.Cutting && CurSubStage == SubStage.Polygon;
-            if (!cuttingByPolygon)
+            bool cuttingInsidePolygon = CurMainStage == Stage.Cutting; //&& CurSubStage == SubStage.Half;
+            if (!cuttingInsidePolygon)
                 return;
+            //if (e.Key == OxyKey.L || e.Key == OxyKey.R && e.IsControlDown)
+            //{
+            //    Selection2DeleteBoundary(e.Key);
+            //    return;
+            //}
             if (e.Key == OxyKey.P && e.IsControlDown)
             {
                 CompletePolygon();//
@@ -201,81 +190,34 @@ namespace FishingNetDesigner.ViewModels
             }
             if (e.Key == OxyKey.Delete)
             {
-                DeleteByPolygon();
-                return;
-            }
-        }
-
-        private void DeleteByPolygon()
-        {
-            if (!CuttingByPolygon.Instance.Completed)
-                throw new Exception("多边形未补全，请在保证有3个点的条件下，按Ctrl+C补全！");
-            List<Line> remainLines = CuttingByPolygon.Instance.Delete();
-            UpdateLines(remainLines);
-        }
-
-        private void onKeyDownCuttingBySide(OxyKeyEventArgs e)
-        {
-            bool cuttingBySide = CurMainStage == Stage.Cutting && CurSubStage == SubStage.Half;
-            if (!cuttingBySide)
-                return;
-            if (e.Key == OxyKey.L || e.Key == OxyKey.R && e.IsControlDown)
-            {
-                Selection2DeleteBoundary(e.Key);
-                return;
-            }
-            if (e.Key == OxyKey.Delete)
-            {
-                DeleteHalf();
+                DeleteInsidePolygon();
                 return;
             }
             ExtendCuttingLine(e.Key);
         }
 
-        private void DeleteHalf()
+        private void DeleteInsidePolygon()
         {
-            if (CuttingBySide.Instance.SelectionBoundary.Points.Count == 0)
-                throw new Exception("请先选择要删除的边！");
-             List<Line> remainLines = CuttingBySide.Instance.Delete();//FishingNet.Instance.DeleteHalf(CuttingBySide.Instance.DeleteSide, cuttingLine);
+            if (!CuttingInsidePolygon.Instance.Completed)
+                throw new Exception("多边形未补全，请在保证有3个点的条件下，按Ctrl+C补全！");
+            List<Line> remainLines = CuttingInsidePolygon.Instance.Delete();
             UpdateLines(remainLines);
         }
 
-        private void Selection2DeleteBoundary(OxyKey oxyKey)
-        {
-            CuttingBySide.Instance.DeleteSide = oxyKey.ToString();
-            CuttingBySide.Instance.SelectSide(oxyKey == OxyKey.L);
-            plotModel.InvalidatePlot(false);
-        }
-
-
+    
       
         void lineSeries_MouseDown(object sender, OxyMouseDownEventArgs e)
         {
             if (CurMainStage == Stage.Cutting)
             {
-                switch(CurSubStage)
-                {
-                    case SubStage.Half:
-                        CutBySide((OxyPlot.Series.LineSeries)sender, e);
-                        break;
-                    case SubStage.Polygon:
-                        CutByPolygon((OxyPlot.Series.LineSeries)sender, e);
-                        break;
-                }
+                CutInsidePolygon((OxyPlot.Series.LineSeries)sender, e);
             }
         }
 
-        private void CutByPolygon(LineSeries lineSeries, OxyMouseDownEventArgs e)
+        private void CutInsidePolygon(OxyPlot.Series.LineSeries lineSeries, OxyMouseDownEventArgs e)
         {
             DataPoint clickPoint = lineSeries.InverseTransform(e.Position);
-            CuttingByPolygon.Instance.AddPoint(clickPoint);
-            plotModel.InvalidatePlot(false);
-        }
-
-        private void CutBySide(OxyPlot.Series.LineSeries lineSeries, OxyMouseDownEventArgs e)
-        {
-            DataPoint clickPoint = lineSeries.InverseTransform(e.Position);
-            CuttingBySide.Instance.StartCutting(clickPoint);
+            CuttingInsidePolygon.Instance.StartCutting(clickPoint);
             plotModel.InvalidatePlot(false);
         }
       

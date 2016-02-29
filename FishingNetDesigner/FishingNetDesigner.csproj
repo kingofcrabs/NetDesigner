@@ -84,18 +84,14 @@
     <Compile Include="data\memo.cs" />
     <Compile Include="data\CommandController.cs" />
     <Compile Include="data\Polygon.cs" />
-    <Compile Include="userControls\CuttingDeletePolygon.xaml.cs">
-      <DependentUpon>CuttingDeletePolygon.xaml</DependentUpon>
-    </Compile>
     <Compile Include="userControls\DefineFishingNet.xaml.cs">
       <DependentUpon>DefineFishingNet.xaml</DependentUpon>
     </Compile>
-    <Compile Include="userControls\CuttingDeleteHalf.xaml.cs">
-      <DependentUpon>CuttingDeleteHalf.xaml</DependentUpon>
+    <Compile Include="userControls\CuttingDeleteInsidePolygon.xaml.cs">
+      <DependentUpon>CuttingDeleteInsidePolygon.xaml</DependentUpon>
     </Compile>
-    <Compile Include="operation\CuttingBySide.cs" />
+    <Compile Include="operation\CuttingInsidePolygon.cs" />
     <Compile Include="data\FishingNet.cs" />
-    <Compile Include="operation\CuttingByPolygon.cs" />
     <Compile Include="userControls\stageControl.cs" />
     <Compile Include="ViewModels\Model.cs" />
     <Page Include="MainWindow.xaml">
@@ -110,15 +106,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="userControls\CuttingDeletePolygon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="userControls\DefineFishingNet.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="userControls\CuttingDeleteHalf.xaml">
+    <Page Include="userControls\CuttingDeleteInsidePolygon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
