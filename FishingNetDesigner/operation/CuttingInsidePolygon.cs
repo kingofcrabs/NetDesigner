@@ -304,8 +304,7 @@ namespace FishingNetDesigner.Data
 
         private void CheckThenAdd(List<Line> survivedLines, List<Point2D> polygonPts, Line l)
         {
-            Point2D pt = new Point2D((l.ptStart.X + l.ptEnd.X) / 2, (l.ptStart.Y + l.ptEnd.Y) / 2);
-            if (!Polygon.IsInPolygon(polygonPts, pt))
+            if (!Polygon.IsInPolygon(polygonPts, l))
                 survivedLines.Add(l);
         }
 
