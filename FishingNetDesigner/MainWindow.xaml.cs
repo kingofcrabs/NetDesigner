@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace FishingNetDesigner
 {
@@ -24,22 +26,23 @@ namespace FishingNetDesigner
     {
         private ViewModels.Model viewModel;
         #region usercontrols
-        CuttingDeleteInsidePolygon delHalfUserControl = null;
+        CuttingDeleteInsidePolygon delPolygonUserControl = null;
         DefineFishingNet defineFishingNetUserControl = null;
-        CommandController commandController = new CommandController();
         #endregion
         public MainWindow()
         {
             InitializeComponent();
             viewModel = new ViewModels.Model();
-            delHalfUserControl = new CuttingDeleteInsidePolygon(viewModel);
+            delPolygonUserControl = new CuttingDeleteInsidePolygon(viewModel);
             defineFishingNetUserControl = new DefineFishingNet(viewModel);
             defineFishingNetUserControl.onNavigation += defineFishingNetUserControl_onNavigation;
             defineFishingNetUserControl.onNotify += defineFishingNetUserControl_onNotify;
-            cuttingApproach.DataContext = commandController;
-            DataContext = viewModel;
             this.Loaded += MainWindow_Loaded;
+            Plot1.Model = viewModel.PlotModel;
+
         }
+
+      
 
         void SetInfo(string s, bool isError = true)
         {
@@ -90,12 +93,7 @@ namespace FishingNetDesigner
             subStageBtns.ForEach(x => x.Background = white);
             var dstButton = GetStageButton(mainStage);
             dstButton.Background = blue;
-            //var subStageBtn = GetStageButton(subStage);
-            //if (subStageBtn != null)
-            //    subStageBtn.Background = blue;
             viewModel.CurMainStage = mainStage;
-            //viewModel.CurSubStage = subStage;
-            commandController.CuttingSubCommandsVisible = mainStage == Stage.Cutting ? Visibility.Visible : Visibility.Hidden;
         }
 
         //Button GetStageButton(SubStage subStage)
@@ -114,30 +112,17 @@ namespace FishingNetDesigner
 
         Button GetStageButton(Stage mainStage)
         {
-            switch (mainStage)
-            {
-                case Stage.Cutting:
-                    return btnCutLine;
-                case Stage.Define:
-                    return btnDefineFishingNet;
-                default:
-                    throw new Exception("找不到当前步骤对应的控件！");
-
-            }
+            Dictionary<Stage, Button> dict = new Dictionary<Stage, Button>();
+            dict.Add(Stage.Cutting, btnCutLine);
+            dict.Add(Stage.Define, btnDefineFishingNet);
+            return dict[mainStage];
         }
         UserControl GetCurrentControl(Stage mainStage)
         {
-            if (mainStage == Stage.Define)
-                return defineFishingNetUserControl;
-            if( mainStage == Stage.Cutting)
-            {
-                //if (subStage == SubStage.Half)
-                //    return delHalfUserControl;
-                //if (subStage == SubStage.Polygon)
-                //    return delPolygonUserControl;
-                return delHalfUserControl;
-            }
-            return null;
+            Dictionary<Stage, UserControl> dict = new Dictionary<Stage, UserControl>();
+            dict.Add(Stage.Cutting, delPolygonUserControl);
+            dict.Add(Stage.Define, defineFishingNetUserControl);
+            return dict[mainStage];
         }
 
       
@@ -168,11 +153,34 @@ namespace FishingNetDesigner
 
         }
 
+        #region commands
+        private void CommandHelp_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            HelpForm helpForm = new HelpForm();
+            helpForm.ShowDialog();
+        }
+
+        private void CommandHelp_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+        #endregion
         
     }
 
 
 
+    public static class ExtensionMethods
+    {
 
+        private static Action EmptyDelegate = delegate() { };
+        public static void ForceRefresh(this UIElement uiElement)
+        {
+
+            uiElement.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+
+        }
+
+    }
   
 }

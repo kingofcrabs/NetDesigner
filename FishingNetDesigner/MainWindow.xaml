@@ -2,7 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:oxy="http://oxyplot.org/wpf"
+        xmlns:oxy2="clr-namespace:OxyPlot.WindowsForms;assembly=OxyPlot.WindowsForms"
         Title="MainWindow" Height="600" Width="1000">
+    <Window.CommandBindings>
+        <CommandBinding Command="Help" Executed="CommandHelp_Executed" CanExecute="CommandHelp_CanExecute"/>
+    </Window.CommandBindings>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -72,8 +76,12 @@
                 <RowDefinition Height="1*"/>
 
             </Grid.RowDefinitions>
-            <oxy:PlotView x:Name="Plot1" Model="{Binding PlotModel}" DefaultTrackerTemplate="{x:Null}"    Margin="10">
-            </oxy:PlotView>
+            <!--<oxy:PlotView x:Name="Plot1" Model="{Binding PlotModel}" DefaultTrackerTemplate="{x:Null}"    Margin="10">
+            </oxy:PlotView>-->
+            <WindowsFormsHost Name="formHost" Margin="10">
+                <oxy2:PlotView x:Name="Plot1"/>
+            </WindowsFormsHost>
+
             <Grid Grid.Row="1" Name="userControlHost">
             </Grid>
         </Grid>

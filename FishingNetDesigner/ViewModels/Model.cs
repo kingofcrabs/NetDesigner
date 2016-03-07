@@ -56,25 +56,28 @@ namespace FishingNetDesigner.ViewModels
              linearAxis1.MajorGridlineStyle = LineStyle.Solid;
              linearAxis1.MinimumPadding = 0;
              linearAxis1.MinimumPadding = 0;
-             linearAxis1.MinorGridlineStyle = LineStyle.Dot;
+             //linearAxis1.MinorGridlineStyle = LineStyle.Dot;
              linearAxis1.Position = AxisPosition.Bottom;
              plotModel1.Axes.Add(linearAxis1);
              var linearAxis2 = new OxyPlot.Axes.LinearAxis();
              linearAxis2.MajorGridlineStyle = LineStyle.Solid;
              linearAxis2.MaximumPadding = 0;
              linearAxis2.MinimumPadding = 0;
-             linearAxis2.MinorGridlineStyle = LineStyle.Dot;
+             //linearAxis2.MinorGridlineStyle = LineStyle.Dot;
              plotModel1.Axes.Add(linearAxis2);
              return plotModel1;
         }
 
         private void AdjustAxes(double xMax, double yMax)
         {
+            
             var max = Math.Max(xMax, yMax);
             var xAxis = plotModel.Axes.First(x => x.Position == AxisPosition.Bottom);
+            
             xAxis.Maximum = max * 1.1;
             xAxis.Minimum = -max * 0.1;
             var yAxis = plotModel.Axes.First(x => x.Position != AxisPosition.Bottom);
+            
             yAxis.Maximum = max * 1.1;
             yAxis.Minimum = -max * 0.1;
         }
@@ -88,7 +91,7 @@ namespace FishingNetDesigner.ViewModels
             lineSeries1.MarkerSize = thickness/3;
             lineSeries1.MarkerStroke = OxyColors.Black;
             lineSeries1.MarkerStrokeThickness = thickness;
-            lineSeries1.MarkerType = MarkerType.Circle;
+            lineSeries1.MarkerType = MarkerType.Square;
             lineSeries1.Title = "Net Lines";
             return lineSeries1;
         }
